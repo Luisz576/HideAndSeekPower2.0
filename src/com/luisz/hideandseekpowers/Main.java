@@ -54,6 +54,8 @@ public class Main extends JavaPlugin{
         powersController.add(Blindness.class);
         powersController.add(Invencible.class);
         powersController.add(X9.class);
+        powersController.add(Levitation.class);
+        powersController.add(SoulExchange.class);
     }
 
     @Override

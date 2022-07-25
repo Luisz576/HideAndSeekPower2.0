@@ -30,6 +30,20 @@ public class ArenasConfig {
         }
     }
 
+    public void addArena(Arena arena){
+        if(getArena(arena.name) == null){
+            List<String> arenas = (List<String>) config.getList("arenas_names");
+            arenas.add(arena.name);
+            String path = "arenas." + arena.name;
+            config.setValue(path + ".maxp", arena.maxPlayers);
+            config.setValue(path + ".minp", arena.minPlayers);
+            config.setValue(path + ".lobby", arena.lobby);
+            config.setValue(path + ".spawn", arena.spawn);
+            config.save();
+            _arenas.add(arena);
+        }
+    }
+
     public Arena getArena(String arena){
         for(Arena a : _arenas){
             if(a.name.equalsIgnoreCase(arena))
