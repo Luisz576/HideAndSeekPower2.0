@@ -1,0 +1,6 @@
+main: com.luisz.hideandseekpowers
+version: 2.0
+name: HideAndSeekPowers
+author: Luisz576
+command:
+  hasp:
