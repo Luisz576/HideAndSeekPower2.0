@@ -43,12 +43,12 @@ public class GamePowerController {
         }
     }
 
-    public void registerPowerRunner(IPower power){
+    public boolean usePower(IPower power){
         HashMap<Class<? extends IPower>, Integer> delays = this.powersDelay.get(power.getWhoUse());
         if(delays != null){
             if(delays.containsKey(power.getClass())) {
                 power.onNeedWaitDelay(delays.get(power.getClass()));
-                return;
+                return false;
             }
         }else
             delays = new HashMap<>();
@@ -61,6 +61,7 @@ public class GamePowerController {
             power.onStart();
         }else
             power.onOnlyUse();
+        return true;
     }
 
 }

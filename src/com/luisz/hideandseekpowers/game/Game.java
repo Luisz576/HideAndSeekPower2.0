@@ -3,6 +3,7 @@ package com.luisz.hideandseekpowers.game;
 import com.luisz.hideandseekpowers.Main;
 import com.luisz.hideandseekpowers.game.arena.Arena;
 import com.luisz.hideandseekpowers.game.power.GamePowerController;
+import com.luisz.hideandseekpowers.game.power.Power;
 import org.bukkit.Difficulty;
 import org.bukkit.GameMode;
 import org.bukkit.World;
@@ -46,6 +47,9 @@ public class Game implements IGame{
 
     public List<Player> getProcuradores(){
         return new ArrayList<>(procuradores);
+    }
+    public List<Player> getEscondedores(){
+        return new ArrayList<>(escondedores);
     }
 
     private final int runEachTickId;
@@ -95,9 +99,10 @@ public class Game implements IGame{
     }
 
     //Items
-    public void _givePowers(){
+    public void _givePowers(boolean canGiveOneThatCanGiveAnother){
         for(Player p : escondedores){
             p.getInventory().clear();
+            Power power = Main.powersController.getRandomPower(canGiveOneThatCanGiveAnother);
             //todo give power
         }
     }
@@ -115,7 +120,7 @@ public class Game implements IGame{
         this.gameState = GameState.GAMEPLAY;
         this.time = TIME_TO_FINISH;
         //todo selecionar procuradores
-        _givePowers();
+        _givePowers(true);
     }
     private void finishGame(){
         this.gameState = GameState.STOPING;

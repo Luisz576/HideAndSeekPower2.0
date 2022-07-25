@@ -36,6 +36,10 @@ public abstract class Power implements IPower{
     @Override
     public void run() {}
     @Override
+    public boolean thisPowerCanGiveAnother(){
+        return false;
+    }
+    @Override
     public void onNeedWaitDelay(int delay) {
         int delayWait = delay / 20 + (delay % 20 == 0 ? 0 : 1);
         who.sendMessage(ChatColor.RED + "Espere " + delayWait + " segundo(s) para usar " + getColorName() + getName() + ChatColor.RED + " novamente!");

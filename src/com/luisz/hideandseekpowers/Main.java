@@ -50,10 +50,15 @@ public class Main extends JavaPlugin{
         powersController.add(Jump.class);
         powersController.add(Mount.class);
         powersController.add(Regive.class);
+        powersController.add(FakePower.class);
+        powersController.add(Blindness.class);
+        powersController.add(Invencible.class);
+        powersController.add(X9.class);
     }
 
     @Override
     public void onDisable() {
         cmd.sendMessage(ChatColor.RED + "[HideAndSeekPowers] Desligado!");
     }
+
 }

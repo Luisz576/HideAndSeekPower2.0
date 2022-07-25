@@ -6,6 +6,7 @@ public interface IPower {
     void onStart();
     void onStop();
     void onOnlyUse();
+    boolean thisPowerCanGiveAnother();
     void onNeedWaitDelay(int delay);
     Player getWhoUse();
     int getTimeRun(); // if 0 don't use run
