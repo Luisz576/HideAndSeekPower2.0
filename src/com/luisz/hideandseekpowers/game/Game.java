@@ -5,6 +5,7 @@ import com.luisz.hideandseekpowers.game.arena.Arena;
 import com.luisz.hideandseekpowers.game.power.GamePowerController;
 import org.bukkit.Difficulty;
 import org.bukkit.GameMode;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 
@@ -15,8 +16,7 @@ public class Game implements IGame{
     public static final int TIME_TO_START = 30,
             TIME_TO_HIDE = 60,
             TIME_TO_FINISH = 10*60,
-            TIME_TO_CLOSE = 20,
-            MAX_PLAYERS = 10;
+            TIME_TO_CLOSE = 20;
 
     private final String id;
     @Override
@@ -26,8 +26,9 @@ public class Game implements IGame{
     private final Arena arena;
     @Override
     public String getArenaName(){
-        return arena.getName();
+        return arena.name;
     }
+    public World getWorld(){ return arena.getWorld(); }
     private final GamePowerController gamePowerController;
     @Override
     public GamePowerController getGamePowerController() {
@@ -39,8 +40,13 @@ public class Game implements IGame{
         return this.gameState;
     }
 
-    private final List<Player> players = new ArrayList<>(),
+    private final List<Player> procuradores = new ArrayList<>(),
+            escondedores = new ArrayList<>(),
             espectadores = new ArrayList<>();
+
+    public List<Player> getProcuradores(){
+        return new ArrayList<>(procuradores);
+    }
 
     private final int runEachTickId;
     private final int runEachSecondId;
@@ -48,7 +54,7 @@ public class Game implements IGame{
 
     @Override
     public boolean isPlayerInsideThisGame(Player player) {
-        return this.players.contains(player) || this.espectadores.contains(player);
+        return this.procuradores.contains(player) || this.escondedores.contains(player) || this.espectadores.contains(player);
     }
 
     public Game(String id, Arena arena){
@@ -88,14 +94,28 @@ public class Game implements IGame{
         time--;
     }
 
+    //Items
+    public void _givePowers(){
+        for(Player p : escondedores){
+            p.getInventory().clear();
+            //todo give power
+        }
+    }
+
     //STATES
     private void startHiding(){
         this.gameState = GameState.HIDING;
         this.time = TIME_TO_HIDE;
+        for(Player p : escondedores)
+            p.teleport(arena.spawn);
+        for(Player p : espectadores)
+            p.teleport(arena.spawn);
     }
     private void startGame(){
         this.gameState = GameState.GAMEPLAY;
         this.time = TIME_TO_FINISH;
+        //todo selecionar procuradores
+        _givePowers();
     }
     private void finishGame(){
         this.gameState = GameState.STOPING;
@@ -111,7 +131,8 @@ public class Game implements IGame{
 
     //player
     private void remove(Player player){
-        players.remove(player);
+        escondedores.remove(player);
+        procuradores.remove(player);
         espectadores.remove(player);
         for(PotionEffect potion : player.getActivePotionEffects())
             player.removePotionEffect(potion.getType());
@@ -122,10 +143,13 @@ public class Game implements IGame{
         player.setLevel(0);
         player.setExp(0);
     }
-    private void addPlayer(Player player){
+    private void addPlayer(Player player, boolean procurador){
         remove(player);
         player.setGameMode(GameMode.ADVENTURE);
-        players.add(player);
+        if(procurador)
+            procuradores.add(player);
+        else
+            escondedores.add(player);
     }
     private void addEspectador(Player player){
         remove(player);
@@ -135,14 +159,14 @@ public class Game implements IGame{
 
     public boolean join(Player player){
         if(gameState == GameState.RECRUITING){
-            if(this.players.size() < MAX_PLAYERS)
-                addPlayer(player);
+            if(this.escondedores.size() < arena.maxPlayers)
+                addPlayer(player, false);
             else
                 addEspectador(player);
-            player.teleport(arena.getLobby());
+            player.teleport(arena.lobby);
         }else if(gameState != GameState.STOPING){
             addEspectador(player);
-            player.teleport(arena.getSpawn());
+            player.teleport(arena.spawn);
         }else
             return false;
         return true;

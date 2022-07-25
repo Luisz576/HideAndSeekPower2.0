@@ -5,8 +5,7 @@ import com.luisz.hideandseekpowers.controller.GameController;
 import com.luisz.hideandseekpowers.controller.PowersController;
 import com.luisz.hideandseekpowers.events.Events;
 import com.luisz.hideandseekpowers.game.arena.ArenasConfig;
-import com.luisz.hideandseekpowers.game.power.powers.Invisibility;
-import com.luisz.hideandseekpowers.game.power.powers.Speed;
+import com.luisz.hideandseekpowers.game.power.powers.*;
 import com.luisz.hideandseekpowers.game.sign.SignsConfig;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -46,6 +45,11 @@ public class Main extends JavaPlugin{
         powersController = new PowersController();
         powersController.add(Speed.class);
         powersController.add(Invisibility.class);
+        powersController.add(Revelation.class);
+        powersController.add(Disguise.class);
+        powersController.add(Jump.class);
+        powersController.add(Mount.class);
+        powersController.add(Regive.class);
     }
 
     @Override

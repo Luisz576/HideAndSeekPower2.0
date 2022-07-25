@@ -53,7 +53,7 @@ public class GamePowerController {
         }else
             delays = new HashMap<>();
         if(power.getDelayToUse() > 0){
-            delays.put(power.getClass(), power.getDelayToUse());
+            delays.put(power.getClass(), power.getDelayToUse()*20);
             this.powersDelay.put(power.getWhoUse(), delays);
         }
         if(power.getTimeRun() > 0) {
