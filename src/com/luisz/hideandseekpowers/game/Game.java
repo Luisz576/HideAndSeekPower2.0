@@ -8,6 +8,7 @@ import org.bukkit.Difficulty;
 import org.bukkit.GameMode;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
+import org.bukkit.event.HandlerList;
 import org.bukkit.potion.PotionEffect;
 
 import java.util.ArrayList;
@@ -41,6 +42,8 @@ public class Game implements IGame{
         return this.gameState;
     }
 
+    private final GameListener gameListener;
+
     private final List<Player> procuradores = new ArrayList<>(),
             escondedores = new ArrayList<>(),
             espectadores = new ArrayList<>();
@@ -71,6 +74,8 @@ public class Game implements IGame{
         this.runEachSecondId = Main.sc.scheduleSyncRepeatingTask(Main.instance, this::runEachSecond, 0, 20L);
         Main.gameController.add(this);
         this.arena.getWorld().setDifficulty(Difficulty.PEACEFUL);
+        this.gameListener = new GameListener(this);
+        Main.pm.registerEvents(this.gameListener, Main.instance);
     }
 
     private void runEachTick(){
@@ -131,6 +136,7 @@ public class Game implements IGame{
         this.gameState = GameState.STOPING;
         Main.sc.cancelTask(runEachTickId);
         Main.sc.cancelTask(runEachSecondId);
+        HandlerList.unregisterAll(this.gameListener);
         Main.gameController.remove(this);
     }
 
