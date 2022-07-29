@@ -7,7 +7,7 @@ public class GameController extends Controller<IGame>{
     @Override
     public boolean add(IGame a) {
         for(IGame g : this._data)
-            if(g.getId().equalsIgnoreCase(a.getId().toLowerCase()))
+            if(g.getArenaName().equalsIgnoreCase(a.getArenaName().toLowerCase()))
                 return false;
         this._data.add(a);
         return true;
@@ -17,7 +17,7 @@ public class GameController extends Controller<IGame>{
     public boolean remove(IGame a) {
         IGame g = null;
         for(IGame game : this._data){
-            if(game.getId().equalsIgnoreCase(a.getId())) {
+            if(game.getArenaName().equalsIgnoreCase(a.getArenaName())) {
                 g = game;
                 break;
             }
@@ -44,9 +44,9 @@ public class GameController extends Controller<IGame>{
         return super.get(index);
     }
 
-    public IGame get(String id) {
+    public IGame getByArena(String arenaName) {
         for(IGame g : this._data)
-            if(g.getId().equalsIgnoreCase(id))
+            if(g.getArenaName().equalsIgnoreCase(arenaName))
                 return g;
         return null;
     }

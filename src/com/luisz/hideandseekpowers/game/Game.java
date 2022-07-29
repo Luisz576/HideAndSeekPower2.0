@@ -20,11 +20,6 @@ public class Game implements IGame{
             TIME_TO_FINISH = 10*60,
             TIME_TO_CLOSE = 20;
 
-    private final String id;
-    @Override
-    public String getId() {
-        return this.id;
-    }
     private final Arena arena;
     @Override
     public String getArenaName(){
@@ -55,7 +50,6 @@ public class Game implements IGame{
         return new ArrayList<>(escondedores);
     }
 
-    private final int runEachTickId;
     private final int runEachSecondId;
     private int time;
 
@@ -64,13 +58,11 @@ public class Game implements IGame{
         return this.procuradores.contains(player) || this.escondedores.contains(player) || this.espectadores.contains(player);
     }
 
-    public Game(String id, Arena arena){
-        this.id = id;
+    public Game(Arena arena){
         this.arena = arena;
         this.gameState = GameState.RECRUITING;
         this.time = TIME_TO_START;
         this.gamePowerController = new GamePowerController();
-        this.runEachTickId = Main.sc.scheduleSyncRepeatingTask(Main.instance, this::runEachTick, 0, 1L);
         this.runEachSecondId = Main.sc.scheduleSyncRepeatingTask(Main.instance, this::runEachSecond, 0, 20L);
         Main.gameController.add(this);
         this.arena.getWorld().setDifficulty(Difficulty.PEACEFUL);
@@ -78,9 +70,6 @@ public class Game implements IGame{
         Main.pm.registerEvents(this.gameListener, Main.instance);
     }
 
-    private void runEachTick(){
-
-    }
     private void runEachSecond(){
         switch (this.gameState){
             case RECRUITING:
@@ -134,7 +123,6 @@ public class Game implements IGame{
     @Override
     public void closeGame(){
         this.gameState = GameState.STOPING;
-        Main.sc.cancelTask(runEachTickId);
         Main.sc.cancelTask(runEachSecondId);
         HandlerList.unregisterAll(this.gameListener);
         Main.gameController.remove(this);
@@ -168,7 +156,7 @@ public class Game implements IGame{
         espectadores.add(player);
     }
 
-    public boolean join(Player player){
+    public void join(Player player){
         if(gameState == GameState.RECRUITING){
             if(this.escondedores.size() < arena.maxPlayers)
                 addPlayer(player, false);
@@ -178,9 +166,7 @@ public class Game implements IGame{
         }else if(gameState != GameState.STOPING){
             addEspectador(player);
             player.teleport(arena.spawn);
-        }else
-            return false;
-        return true;
+        }
     }
 
     public void quit(Player player){

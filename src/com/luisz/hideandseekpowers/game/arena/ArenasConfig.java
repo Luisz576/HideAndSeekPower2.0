@@ -19,18 +19,23 @@ public class ArenasConfig {
 
     private void _loadArenas(){
         List<String> arenas = (List<String>) config.getList("arenas_names");
-        for(String arena : arenas){
-            Arena a = new Arena();
-            a.name = arena;
-            a.maxPlayers = config.getInt("arenas." + arena + ".maxp");
-            a.minPlayers = config.getInt("arenas." + arena + ".minp");
-            a.lobby = config.getLocation("arenas" + arena + "lobby");
-            a.spawn = config.getLocation("arenas" + arena + "spawn");
-            _arenas.add(a);
+        if(arenas != null)
+            for(String arena : arenas){
+                Arena a = new Arena();
+                a.name = arena;
+                a.maxPlayers = config.getInt("arenas." + arena + ".maxp");
+                a.minPlayers = config.getInt("arenas." + arena + ".minp");
+                a.lobby = config.getLocation("arenas" + arena + "lobby");
+                a.spawn = config.getLocation("arenas" + arena + "spawn");
+                _arenas.add(a);
+            }
+        else{
+            config.setValue("arenas_names", new ArrayList<String>());
+            config.save();
         }
     }
 
-    public void addArena(Arena arena){
+    public int addArena(Arena arena){
         if(getArena(arena.name) == null){
             List<String> arenas = (List<String>) config.getList("arenas_names");
             arenas.add(arena.name);
@@ -39,9 +44,29 @@ public class ArenasConfig {
             config.setValue(path + ".minp", arena.minPlayers);
             config.setValue(path + ".lobby", arena.lobby);
             config.setValue(path + ".spawn", arena.spawn);
-            config.save();
             _arenas.add(arena);
+            save();
+            return 0;
         }
+        return 1;
+    }
+
+    public int removeArena(String arenaName){
+        if(getArena(arenaName) != null){
+            config.remove("arenas." + arenaName);
+            _arenas.remove(getArena(arenaName));
+            save();
+            return 0;
+        }
+        return 1;
+    }
+
+    private void save(){
+        List<String> arenas = new ArrayList<>();
+        for(Arena a : _arenas)
+            arenas.add(a.name);
+        config.setValue("arenas_names", arenas);
+        config.save();
     }
 
     public Arena getArena(String arena){

@@ -3,6 +3,7 @@ package com.luisz.hideandseekpowers;
 import com.luisz.hideandseekpowers.command.Commands;
 import com.luisz.hideandseekpowers.controller.GameController;
 import com.luisz.hideandseekpowers.controller.PowersController;
+import com.luisz.hideandseekpowers.controller.SignController;
 import com.luisz.hideandseekpowers.events.Events;
 import com.luisz.hideandseekpowers.game.arena.ArenasConfig;
 import com.luisz.hideandseekpowers.game.power.powers.*;
@@ -25,6 +26,7 @@ public class Main extends JavaPlugin{
     public static PowersController powersController;
     public static ArenasConfig arenasConfig;
     public static SignsConfig signsConfig;
+    public static SignController signController;
 
     @Override
     public void onEnable() {
@@ -32,10 +34,12 @@ public class Main extends JavaPlugin{
         cmd = Bukkit.getConsoleSender();
         sc = Bukkit.getScheduler();
         pm = Bukkit.getPluginManager();
-        gameController = new GameController();
-        initPowersController();
         arenasConfig = new ArenasConfig(instance);
         signsConfig = new SignsConfig(instance);
+        gameController = new GameController();
+        signController = new SignController();
+        initPowersController();
+        signController.loadSigns(signsConfig);
         Objects.requireNonNull(getCommand("hasp")).setExecutor(new Commands());
         pm.registerEvents(new Events(), instance);
         cmd.sendMessage(ChatColor.GREEN + "[HideAndSeekPowers] Ligado!");
