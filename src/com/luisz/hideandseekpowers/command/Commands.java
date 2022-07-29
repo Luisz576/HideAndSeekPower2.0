@@ -6,6 +6,7 @@ import com.luisz.hideandseekpowers.game.Game;
 import com.luisz.hideandseekpowers.game.IGame;
 import com.luisz.hideandseekpowers.game.arena.Arena;
 import com.luisz.hideandseekpowers.game.sign.SignGame;
+import com.luisz.hideandseekpowers.lib576.LConvert;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -82,17 +83,80 @@ public class Commands implements CommandExecutor {
                             p.sendMessage(ChatColor.RED + "Use: /hasp deletesign <signName>");
                         break;
                     case "deletearena":
+                        if(args.length > 1){
+                            if(Main.arenasConfig.getArena(args[1].toLowerCase()) != null){
+                                Main.arenasConfig.removeArena(args[1].toLowerCase());
+                                p.sendMessage(ChatColor.GREEN + "Arena removida!");
+                            }else
+                                p.sendMessage(ChatColor.RED + "Não existe uma arena com esse nome!");
+                        }else
+                            p.sendMessage(ChatColor.RED + "Use: /hasp deletearena <arenaName>");
                         break;
                     case "createarena":
+                        if(args.length > 2){
+                            int min = LConvert.convertToInteger(args[1]), max = LConvert.convertToInteger(args[2]);
+                            if(min > 1 && max > 1){
+                                if(BuildingMemory.buildingArena.get(p) != null){
+                                    if(BuildingMemory.buildingArena.get(p).spawn != null &&
+                                        BuildingMemory.buildingArena.get(p).lobby != null){
+                                        BuildingMemory.buildingArena.get(p).minPlayers = min;
+                                        BuildingMemory.buildingArena.get(p).maxPlayers = max;
+                                        Main.arenasConfig.addArena(BuildingMemory.buildingArena.get(p));
+                                        BuildingMemory.buildingArena.remove(p);
+                                        p.sendMessage(ChatColor.GREEN + "Arena criada!");
+                                    }else
+                                        p.sendMessage(ChatColor.RED + "Arena incompleta!");
+                                }else
+                                    p.sendMessage(ChatColor.RED + "Você não está editando uma arena!");
+                            }else
+                                p.sendMessage(ChatColor.RED + "Informe números válidos!");
+                        }else
+                            p.sendMessage(ChatColor.RED + "Use: /hasp createarena <minPlayers> <maxPlayers>");
                         break;
                     case "buildarena":
                         if(args.length > 1){
                             switch (args[1].toLowerCase()){
+                                case "start":
+                                    if(args.length > 2){
+                                        String arenaName = args[2].toLowerCase();
+                                        if(Main.arenasConfig.getArena(arenaName) == null){
+                                            Arena arena = new Arena();
+                                            arena.name = arenaName;
+                                            BuildingMemory.buildingArena.put(p, arena);
+                                            p.sendMessage(ChatColor.GREEN + "Editando uma nova arena!");
+                                        }else
+                                            p.sendMessage(ChatColor.RED + "Essa arena já existe!");
+                                    }else
+                                        p.sendMessage(ChatColor.RED + "Use: /hasp buildarena start <arenaName>");
+                                    break;
                                 case "name":
+                                    if(args.length > 2){
+                                        String arenaName = args[2].toLowerCase();
+                                        if(Main.arenasConfig.getArena(arenaName) == null){
+                                            if(BuildingMemory.buildingArena.get(p) != null){
+                                                String oldName = BuildingMemory.buildingArena.get(p).name;
+                                                BuildingMemory.buildingArena.get(p).name = arenaName;
+                                                p.sendMessage(ChatColor.GREEN + "Nome trocado de " + oldName + " para " + BuildingMemory.buildingArena.get(p).name + "!");
+                                            }else
+                                                p.sendMessage(ChatColor.RED + "Você não está editando uma arena!");
+                                        }else
+                                            p.sendMessage(ChatColor.RED + "Já existe uma arena com esse nome!");
+                                    }else
+                                        p.sendMessage(ChatColor.RED + "Use: /hasp buildarena name <arenaName>");
                                     break;
                                 case "spawn":
+                                    if(BuildingMemory.buildingArena.get(p) != null){
+                                        BuildingMemory.buildingArena.get(p).spawn = p.getLocation();
+                                        p.sendMessage(ChatColor.GREEN + "Spawn atualizado!");
+                                    }else
+                                        p.sendMessage(ChatColor.RED + "Você não está editando uma arena!");
                                     break;
                                 case "lobby":
+                                    if(BuildingMemory.buildingArena.get(p) != null){
+                                        BuildingMemory.buildingArena.get(p).lobby = p.getLocation();
+                                        p.sendMessage(ChatColor.GREEN + "Lobby atualizado!");
+                                    }else
+                                        p.sendMessage(ChatColor.RED + "Você não está editando uma arena!");
                                     break;
                                 default:
                                     p.sendMessage(ChatColor.RED + "Esse comando não existe ou ainda não foi adicionado!");

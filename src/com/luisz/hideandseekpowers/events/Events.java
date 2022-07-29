@@ -18,8 +18,11 @@ public class Events implements Listener {
     public void onBreakBlock(BlockBreakEvent e){
         if(Main.gameController.get(e.getPlayer()) == null)
             if(SignGame.isSign(e.getBlock().getType()))
-                if(e.getPlayer().getInventory().getItemInMainHand().getType() == Material.WOODEN_PICKAXE)
+                if(e.getPlayer().getInventory().getItemInMainHand().getType() == Material.WOODEN_PICKAXE) {
                     BuildingMemory.buildingSign.put(e.getPlayer(), e.getBlock().getLocation());
+                    e.getPlayer().sendMessage(ChatColor.YELLOW + "Editando essa Sign");
+                    e.setCancelled(true);
+                }
     }
 
     @EventHandler
