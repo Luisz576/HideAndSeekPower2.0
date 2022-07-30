@@ -8,23 +8,19 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
-public class FakePower extends Power {
+import java.util.Random;
 
-    public FakePower(Game game, Player who, Location whereUse){
+public class Gift extends Power {
+
+    public Gift(Game game, Player who, Location whereUse){
         super(game, who, whereUse);
     }
 
     @Override
     public void onOnlyUse() {
-        int count = 0;
-        while(count < Main.powersController.size()){
-            Power power = Main.powersController.createPower(Main.powersController.get(count), game, who, whereUse);
-            if(game.getGamePowerController().usePower(power)) {
-                count = Main.powersController.size();
-                who.sendMessage(ChatColor.YELLOW + "Você usou " + power.getColorName() + power.getName() + ChatColor.YELLOW + "!");
-            }
-            count++;
-        }
+        Random r = new Random();
+        Player pr = game.getEscondedores().get(r.nextInt(game.getEscondedores().size()));
+        pr.getInventory().addItem(Main.powersController.getRandomPower(true).getDefaultItemAndAmount());
     }
 
     @Override
@@ -33,22 +29,26 @@ public class FakePower extends Power {
     }
     @Override
     public int getDelayToUse(){
-        return 20;
+        return 0;
     }
     @Override
     public Material getIcon() {
-        return Material.SPIDER_EYE;
+        return Material.DRIED_KELP_BLOCK;
     }
     @Override
     public int getDefaultAmount() {
-        return 2;
+        return 1;
+    }
+    @Override
+    public boolean thisPowerCanGiveAnother() {
+        return true;
     }
     @Override
     public String getName(){
-        return "Fake Power";
+        return "Gift";
     }
     @Override
     public ChatColor getColorName(){
-        return ChatColor.GRAY;
+        return ChatColor.GREEN;
     }
 }

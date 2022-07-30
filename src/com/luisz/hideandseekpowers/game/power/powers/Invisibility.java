@@ -34,7 +34,7 @@ public class Invisibility extends Power {
     }
     @Override
     public int getDefaultAmount() {
-        return 1;
+        return 2;
     }
     @Override
     public String getName(){

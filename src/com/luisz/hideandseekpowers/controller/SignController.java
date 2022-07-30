@@ -1,13 +1,18 @@
 package com.luisz.hideandseekpowers.controller;
 
+import com.luisz.hideandseekpowers.Main;
 import com.luisz.hideandseekpowers.game.sign.SignGame;
-import com.luisz.hideandseekpowers.game.sign.SignsConfig;
 import org.bukkit.Location;
 
 public class SignController extends Controller<SignGame>{
 
-    public void loadSigns(SignsConfig config){
-        this._data.addAll(config.getAll());
+    public void loadSignsAndStartRun(){
+        this._data.clear();
+        this._data.addAll(Main.signsConfig.getAll());
+        Main.sc.scheduleSyncRepeatingTask(Main.instance, () -> {
+            for(SignGame s : this._data)
+                s._update();
+        }, 0, 5L);
     }
 
     public SignGame get(Location location){

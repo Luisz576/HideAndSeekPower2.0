@@ -25,14 +25,18 @@ public class ArenasConfig {
                 a.name = arena;
                 a.maxPlayers = config.getInt("arenas." + arena + ".maxp");
                 a.minPlayers = config.getInt("arenas." + arena + ".minp");
-                a.lobby = config.getLocation("arenas" + arena + "lobby");
-                a.spawn = config.getLocation("arenas" + arena + "spawn");
+                a.lobby = config.getLocation("arenas." + arena + ".lobby");
+                a.spawn = config.getLocation("arenas." + arena + ".spawn");
                 _arenas.add(a);
             }
         else{
             config.setValue("arenas_names", new ArrayList<String>());
             config.save();
         }
+    }
+
+    public List<Arena> getAllArenas(){
+        return new ArrayList<>(this._arenas);
     }
 
     public int addArena(Arena arena){

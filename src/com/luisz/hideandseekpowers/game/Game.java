@@ -50,6 +50,14 @@ public class Game implements IGame{
         return new ArrayList<>(escondedores);
     }
 
+    public int getAmountOfPlayers(){
+        return escondedores.size() + procuradores.size();
+    }
+
+    public int getMaxPlayers(){
+        return arena.maxPlayers;
+    }
+
     private final int runEachSecondId;
     private int time;
 
@@ -93,11 +101,10 @@ public class Game implements IGame{
     }
 
     //Items
-    public void _givePowers(boolean canGiveOneThatCanGiveAnother){
+    private void _givePowers(){
         for(Player p : escondedores){
-            p.getInventory().clear();
-            Power power = Main.powersController.getRandomPower(canGiveOneThatCanGiveAnother);
-            //todo give power
+            Power power = Main.powersController.getRandomPower(true);
+            p.getInventory().addItem(power.getDefaultItemAndAmount());
         }
     }
 
@@ -114,7 +121,7 @@ public class Game implements IGame{
         this.gameState = GameState.GAMEPLAY;
         this.time = TIME_TO_FINISH;
         //todo selecionar procuradores
-        _givePowers(true);
+        _givePowers();
     }
     private void finishGame(){
         this.gameState = GameState.STOPING;

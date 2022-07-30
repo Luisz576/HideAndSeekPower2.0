@@ -28,6 +28,20 @@ public class Commands implements CommandExecutor {
         if(cmd.getName().equalsIgnoreCase("hasp")){
             if(args.length > 0){
                 switch(args[0].toLowerCase()){
+                    case "getpower":
+                        if(args.length > 1){
+                            int pId = LConvert.convertToInteger(args[1]);
+                            if(pId >= 0){
+                                if(pId < Main.powersController.size()){
+                                    p.getInventory().addItem(Main.powersController.createEmptyPowerThatDoesntWork(Main.powersController.get(pId)).getDefaultItemAndAmount());
+                                    p.sendMessage(ChatColor.YELLOW + "Poder pego!");
+                                }else
+                                    p.sendMessage(ChatColor.RED + "Power não encontrado!");
+                            }else
+                                p.sendMessage(ChatColor.RED + "Informe um número válido!");
+                        }else
+                            p.sendMessage(ChatColor.RED + "Use: /hasp getpower <id>");
+                        break;
                     case "startarena":
                         if(args.length > 1){
                             Arena arena = Main.arenasConfig.getArena(args[1].toLowerCase());
@@ -55,6 +69,14 @@ public class Commands implements CommandExecutor {
                         }else
                             p.sendMessage(ChatColor.RED + "Use: /hasp stoparena <arena>");
                         break;
+                    case "listsigns":
+                        if(Main.signsConfig.getAll().size() > 0) {
+                            p.sendMessage(ChatColor.YELLOW + "==== SIGNS ====");
+                            for (SignGame s : Main.signsConfig.getAll())
+                                p.sendMessage(ChatColor.YELLOW + "- " + s.signName);
+                        }else
+                            p.sendMessage(ChatColor.YELLOW + "Nenhuma sign cadastrada!");
+                        break;
                     case "createsign":
                         if(args.length > 2){
                             String signName = args[1].toLowerCase(), arenaName = args[2].toLowerCase();
@@ -81,6 +103,14 @@ public class Commands implements CommandExecutor {
                                 p.sendMessage(ChatColor.RED + "Não existe uma sign com esse nome!");
                         }else
                             p.sendMessage(ChatColor.RED + "Use: /hasp deletesign <signName>");
+                        break;
+                    case "listarenas":
+                        if(Main.arenasConfig.getAllArenas().size() > 0){
+                            p.sendMessage(ChatColor.YELLOW + "==== ARENAS ====");
+                            for(Arena a : Main.arenasConfig.getAllArenas())
+                                p.sendMessage(ChatColor.YELLOW + "- " + a.name);
+                        }else
+                            p.sendMessage(ChatColor.YELLOW + "Nenhuma arena cadastrada");
                         break;
                     case "deletearena":
                         if(args.length > 1){

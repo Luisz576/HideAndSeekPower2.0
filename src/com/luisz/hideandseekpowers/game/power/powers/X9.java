@@ -6,6 +6,8 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 import java.util.List;
 import java.util.Random;
@@ -18,17 +20,20 @@ public class X9 extends Power {
 
     @Override
     public void onOnlyUse() {
-        Invisibility invisibility = new Invisibility(game, who, whereUse);
-        Invencible invencible = new Invencible(game, who, whereUse);
-        game.getGamePowerController().usePower(invisibility);
-        game.getGamePowerController().usePower(invencible);
-        Random r = new Random();
         List<Player> players = game.getEscondedores();
         players.remove(who);
-        Player pt = players.get(r.nextInt(players.size()));
-        pt.teleport(game.getProcuradores().get(0).getLocation());
-        Invencible invencible2 = new Invencible(game, pt, game.getProcuradores().get(0).getLocation());
-        game.getGamePowerController().usePower(invencible2);
+        if(players.size() > 0){
+            //who use
+            Invisibility invisibility = new Invisibility(game, who, whereUse);
+            Invencible invencible = new Invencible(game, who, whereUse);
+            Speed speed = new Speed(game, who, whereUse);
+            game.getGamePowerController().usePower(invisibility);
+            game.getGamePowerController().usePower(invencible);
+            game.getGamePowerController().usePower(speed);
+            //random player
+            Random r = new Random();
+            players.get(r.nextInt(players.size())).addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, 6 * 20, 2));
+        }
     }
 
     @Override

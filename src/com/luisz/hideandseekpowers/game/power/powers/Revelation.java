@@ -38,7 +38,7 @@ public class Revelation extends Power {
     }
     @Override
     public int getDefaultAmount() {
-        return 2;
+        return 3;
     }
     @Override
     public String getName(){

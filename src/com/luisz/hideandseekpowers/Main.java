@@ -39,7 +39,7 @@ public class Main extends JavaPlugin{
         gameController = new GameController();
         signController = new SignController();
         initPowersController();
-        signController.loadSigns(signsConfig);
+        signController.loadSignsAndStartRun();
         Objects.requireNonNull(getCommand("hasp")).setExecutor(new Commands());
         pm.registerEvents(new Events(), instance);
         cmd.sendMessage(ChatColor.GREEN + "[HideAndSeekPowers] Ligado!");
@@ -60,6 +60,7 @@ public class Main extends JavaPlugin{
         powersController.add(X9.class);
         powersController.add(Levitation.class);
         powersController.add(SoulExchange.class);
+        powersController.add(Hungry.class);
     }
 
     @Override

@@ -16,13 +16,19 @@ public class Events implements Listener {
 
     @EventHandler
     public void onBreakBlock(BlockBreakEvent e){
-        if(Main.gameController.get(e.getPlayer()) == null)
-            if(SignGame.isSign(e.getBlock().getType()))
-                if(e.getPlayer().getInventory().getItemInMainHand().getType() == Material.WOODEN_PICKAXE) {
-                    BuildingMemory.buildingSign.put(e.getPlayer(), e.getBlock().getLocation());
-                    e.getPlayer().sendMessage(ChatColor.YELLOW + "Editando essa Sign");
-                    e.setCancelled(true);
+        if(SignGame.isSign(e.getBlock().getType())) {
+            if(Main.signController.get(e.getBlock().getLocation()) == null) {
+                if (Main.gameController.get(e.getPlayer()) == null) {
+                    if (e.getPlayer().getInventory().getItemInMainHand().getType() == Material.WOODEN_PICKAXE) {
+                        BuildingMemory.buildingSign.put(e.getPlayer(), e.getBlock().getLocation());
+                        e.getPlayer().sendMessage(ChatColor.YELLOW + "Editando essa Sign");
+                        e.setCancelled(true);
+                    }
                 }
+            }else{
+                e.setCancelled(true);
+            }
+        }
     }
 
     @EventHandler
@@ -47,10 +53,10 @@ public class Events implements Listener {
         if (event.getAction() == Action.PHYSICAL) {
             Block block = event.getClickedBlock();
             if (block == null) return;
-            if (block.getType() == Material.LEGACY_SOIL) {
+            if (block.getType() == Material.FARMLAND || block.getType() == Material.LEGACY_SOIL) {
                 event.setUseInteractedBlock(org.bukkit.event.Event.Result.DENY);
                 event.setCancelled(true);
-                block.setType(block.getType());
+                block.setBlockData(block.getBlockData());
             }
         }
     }
