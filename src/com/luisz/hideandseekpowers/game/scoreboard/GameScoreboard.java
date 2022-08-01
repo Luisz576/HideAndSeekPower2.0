@@ -9,6 +9,8 @@ import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Score;
 import org.bukkit.scoreboard.Scoreboard;
 
+import java.util.Objects;
+
 public class GameScoreboard {
 
     private final Game game;
@@ -18,7 +20,7 @@ public class GameScoreboard {
     }
 
     public void updateRender(){
-        Scoreboard board = Bukkit.getScoreboardManager().getNewScoreboard();
+        Scoreboard board = Objects.requireNonNull(Bukkit.getScoreboardManager()).getNewScoreboard();
         Objective obj = board.registerNewObjective("hasp", "game");
         obj.setDisplayName(ChatColor.YELLOW + "HASP2.0");
         obj.setDisplaySlot(DisplaySlot.SIDEBAR);

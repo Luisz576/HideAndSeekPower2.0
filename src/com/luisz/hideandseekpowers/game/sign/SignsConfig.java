@@ -1,16 +1,14 @@
 package com.luisz.hideandseekpowers.game.sign;
 
-import com.luisz.hideandseekpowers.game.arena.Arena;
 import com.luisz.hideandseekpowers.lib576.LConfig;
 import org.bukkit.Location;
-import org.bukkit.block.Sign;
 import org.bukkit.plugin.Plugin;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class SignsConfig {
-    private LConfig config;
+    private final LConfig config;
     private final List<SignGame> _signs = new ArrayList<>();
 
     public SignsConfig(Plugin plugin){

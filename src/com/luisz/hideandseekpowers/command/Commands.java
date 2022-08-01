@@ -57,7 +57,7 @@ public class Commands implements CommandExecutor {
                         break;
                     case "stoparena":
                         if(args.length > 1){
-                            IGame game = Main.gameController.getByArena(args[1].toLowerCase());
+                            Game game = Main.gameController.getByArena(args[1].toLowerCase());
                             if(game != null){
                                 if(Main.gameController.remove(game))
                                     p.sendMessage(ChatColor.GREEN + "Arena fechada!");
