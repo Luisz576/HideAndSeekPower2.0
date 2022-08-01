@@ -3,7 +3,6 @@ package com.luisz.hideandseekpowers.command;
 import com.luisz.hideandseekpowers.Main;
 import com.luisz.hideandseekpowers.building.BuildingMemory;
 import com.luisz.hideandseekpowers.game.Game;
-import com.luisz.hideandseekpowers.game.IGame;
 import com.luisz.hideandseekpowers.game.arena.Arena;
 import com.luisz.hideandseekpowers.game.sign.SignGame;
 import com.luisz.hideandseekpowers.lib576.LConvert;

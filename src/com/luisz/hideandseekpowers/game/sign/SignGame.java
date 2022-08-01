@@ -1,7 +1,7 @@
 package com.luisz.hideandseekpowers.game.sign;
 
 import com.luisz.hideandseekpowers.Main;
-import com.luisz.hideandseekpowers.game.IGame;
+import com.luisz.hideandseekpowers.game.Game;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -20,7 +20,7 @@ public class SignGame {
     }
 
     public int join(Player player){
-        IGame game = Main.gameController.getByArena(arenaName);
+        Game game = Main.gameController.getByArena(arenaName);
         if(game != null) {
             if(Main.gameController.get(player) != null)
                 return 2;
@@ -32,7 +32,7 @@ public class SignGame {
 
     public void _update(){
         Sign sign = (Sign) this.location.getBlock().getState();
-        IGame game = Main.gameController.getByArena(this.arenaName);
+        Game game = Main.gameController.getByArena(this.arenaName);
         sign.setLine(0, ChatColor.BLACK + "[HASP2.0]");
         sign.setLine(1, ChatColor.BLACK + this.arenaName);
         sign.setLine(2, ChatColor.BLACK + "0/0");

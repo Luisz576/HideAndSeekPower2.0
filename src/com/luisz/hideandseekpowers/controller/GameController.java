@@ -1,12 +1,12 @@
 package com.luisz.hideandseekpowers.controller;
 
-import com.luisz.hideandseekpowers.game.IGame;
+import com.luisz.hideandseekpowers.game.Game;
 import org.bukkit.entity.Player;
 
-public class GameController extends Controller<IGame>{
+public class GameController extends Controller<Game>{
     @Override
-    public boolean add(IGame a) {
-        for(IGame g : this._data)
+    public boolean add(Game a) {
+        for(Game g : this._data)
             if(g.getArenaName().equalsIgnoreCase(a.getArenaName().toLowerCase()))
                 return false;
         this._data.add(a);
@@ -14,9 +14,9 @@ public class GameController extends Controller<IGame>{
     }
 
     @Override
-    public boolean remove(IGame a) {
-        IGame g = null;
-        for(IGame game : this._data){
+    public boolean remove(Game a) {
+        Game g = null;
+        for(Game game : this._data){
             if(game.getArenaName().equalsIgnoreCase(a.getArenaName())) {
                 g = game;
                 break;
@@ -31,7 +31,7 @@ public class GameController extends Controller<IGame>{
 
     @Override
     public boolean remove(int index) {
-        IGame game = this._data.remove(index);
+        Game game = this._data.remove(index);
         if(game != null){
             game.closeGame();
             return true;
@@ -40,19 +40,19 @@ public class GameController extends Controller<IGame>{
     }
 
     @Override
-    public IGame get(int index) {
+    public Game get(int index) {
         return super.get(index);
     }
 
-    public IGame getByArena(String arenaName) {
-        for(IGame g : this._data)
+    public Game getByArena(String arenaName) {
+        for(Game g : this._data)
             if(g.getArenaName().equalsIgnoreCase(arenaName))
                 return g;
         return null;
     }
 
-    public IGame get(Player player){
-        for(IGame g : this._data)
+    public Game get(Player player){
+        for(Game g : this._data)
             if(g.isPlayerInsideThisGame(player))
                 return g;
         return null;

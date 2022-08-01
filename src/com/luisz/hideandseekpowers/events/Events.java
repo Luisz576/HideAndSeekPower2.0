@@ -2,6 +2,7 @@ package com.luisz.hideandseekpowers.events;
 
 import com.luisz.hideandseekpowers.Main;
 import com.luisz.hideandseekpowers.building.BuildingMemory;
+import com.luisz.hideandseekpowers.game.Game;
 import com.luisz.hideandseekpowers.game.sign.SignGame;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -10,7 +11,9 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.player.PlayerBedEnterEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 
 public class Events implements Listener {
 
@@ -59,6 +62,21 @@ public class Events implements Listener {
                 block.setBlockData(block.getBlockData());
             }
         }
+    }
+
+    @EventHandler
+    public void onPlayerBedEnter(PlayerBedEnterEvent e){
+        if(Main.gameController.get(e.getPlayer()) != null) {
+            e.setCancelled(true);
+            e.getPlayer().sendMessage(ChatColor.RED + "Você não pode dormir durante uma partida!");
+        }
+    }
+
+    @EventHandler
+    public void onPlayerQuit(PlayerQuitEvent e){
+        Game game = Main.gameController.get(e.getPlayer());
+        if(game != null)
+            game.quit(e.getPlayer());
     }
 
 }
