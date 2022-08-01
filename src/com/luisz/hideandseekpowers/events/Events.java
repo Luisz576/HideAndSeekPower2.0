@@ -7,10 +7,13 @@ import com.luisz.hideandseekpowers.game.sign.SignGame;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.inventory.InventoryInteractEvent;
 import org.bukkit.event.player.PlayerBedEnterEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
@@ -19,7 +22,9 @@ public class Events implements Listener {
 
     @EventHandler
     public void onBreakBlock(BlockBreakEvent e){
-        if(SignGame.isSign(e.getBlock().getType())) {
+        if(Main.gameController.get(e.getPlayer()) != null)
+            e.setCancelled(true);
+        else if(SignGame.isSign(e.getBlock().getType())) {
             if(Main.signController.get(e.getBlock().getLocation()) == null) {
                 if (Main.gameController.get(e.getPlayer()) == null) {
                     if (e.getPlayer().getInventory().getItemInMainHand().getType() == Material.WOODEN_PICKAXE) {
@@ -77,6 +82,19 @@ public class Events implements Listener {
         Game game = Main.gameController.get(e.getPlayer());
         if(game != null)
             game.quit(e.getPlayer());
+    }
+
+    @EventHandler
+    public void onPlaceBlock(BlockPlaceEvent e){
+        if(Main.gameController.get(e.getPlayer()) != null)
+            e.setCancelled(true);
+    }
+
+    @EventHandler
+    public void onInventoryInteract(InventoryInteractEvent e){
+        if(e.getWhoClicked() instanceof Player)
+            if(Main.gameController.get((Player) e.getWhoClicked()) != null)
+                e.setCancelled(true);
     }
 
 }

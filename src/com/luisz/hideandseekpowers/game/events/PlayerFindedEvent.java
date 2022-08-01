@@ -8,13 +8,11 @@ public class PlayerFindedEvent extends CustomEvent {
 
     public final Game game;
     public final Player who, finder;
-    public final FindType reason;
 
-    public PlayerFindedEvent(Game game, Player who, Player finder, FindType reason){
+    public PlayerFindedEvent(Game game, Player who, Player finder){
         this.game = game;
         this.who = who;
         this.finder = finder;
-        this.reason = reason;
     }
 
 }

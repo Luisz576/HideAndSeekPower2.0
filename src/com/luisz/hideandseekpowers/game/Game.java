@@ -7,15 +7,20 @@ import com.luisz.hideandseekpowers.game.events.PlayerQuitOfGameEvent;
 import com.luisz.hideandseekpowers.game.power.GamePowerController;
 import com.luisz.hideandseekpowers.game.power.Power;
 import com.luisz.hideandseekpowers.game.scoreboard.GameScoreboard;
+import net.minecraft.server.v1_16_R3.IChatBaseComponent;
+import net.minecraft.server.v1_16_R3.PacketPlayOutTitle;
 import org.bukkit.ChatColor;
 import org.bukkit.Difficulty;
 import org.bukkit.GameMode;
 import org.bukkit.World;
+import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.potion.PotionEffect;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 
@@ -41,6 +46,12 @@ public class Game{
     }
 
     private final GameListener gameListener;
+
+    //placar
+    private final HashMap<Player, Integer> placar = new HashMap<>();
+    public void addPointTo(Player player){
+        placar.put(player, placar.get(player) + 1);
+    }
 
     private final List<Player> procuradores = new ArrayList<>(),
             escondedores = new ArrayList<>(),
@@ -93,18 +104,28 @@ public class Game{
             case RECRUITING:
                 if(time <= 0)
                     startHiding();
+                else if(time < 10)
+                    sendMessageToAll(ChatColor.YELLOW + "O jogo começa em " + time + " segundo(s)!");
                 break;
             case HIDING:
                 if(time <= 0)
                     startGame();
+                else if(time < 10)
+                    sendMessageToAll(ChatColor.YELLOW + "A fera sairá em " + time + " segundo(s)!");
                 break;
             case GAMEPLAY:
                 if(time <= 0)
                     finishGame(true);
+                else if(time < 10)
+                    sendMessageToAll(ChatColor.YELLOW + "O jogo acaba em " + time + " segundo(s)!");
+                else if(time % 60 == 0)
+                    sendMessageToAll(ChatColor.YELLOW + "O jogo acaba em " + (time / 60) + " minuto(s)!");
                 break;
             case STOPING:
                 if(time <= 0)
                     closeGame();
+                else if(time < 10)
+                    sendMessageToAll(ChatColor.YELLOW + "O jogo finaliza em " + time + " segundo(s)!");
                 break;
         }
         time--;
@@ -133,12 +154,26 @@ public class Game{
     private void finishGame(boolean hidersWin){
         this.gameState = GameState.STOPING;
         this.time = TIME_TO_CLOSE;
+        if(hidersWin){
+            sendTitleToAll(ChatColor.GREEN + "Escondedores");
+            sendMessageToAll(ChatColor.GREEN + "Escondedores venceram!!!");
+        }else{
+            sendTitleToAll(ChatColor.RED + "Procuradores");
+            sendMessageToAll(ChatColor.RED + "Procuradores venceram!!!");
+        }
     }
     public void closeGame(){
         this.gameState = GameState.STOPING;
         Main.sc.cancelTask(runEachSecondId);
         HandlerList.unregisterAll(this.gameListener);
         Main.gameController.remove(this);
+        // ESPECIFICO PARA O TESTE, AQUI TROCA PARA SEU LOBBY
+        for(Player p : procuradores)
+            p.teleport(arena.lobby);
+        for(Player p : espectadores)
+            p.teleport(arena.lobby);
+        for(Player p : escondedores)
+            p.teleport(arena.lobby);
     }
 
     //player
@@ -160,9 +195,10 @@ public class Game{
     private void addPlayer(Player player, boolean procurador){
         remove(player);
         player.setGameMode(GameMode.ADVENTURE);
-        if(procurador)
+        if(procurador) {
             procuradores.add(player);
-        else
+            giveProcuradorsItemsTo(player);
+        }else
             escondedores.add(player);
     }
     private void addEspectador(Player player){
@@ -177,6 +213,11 @@ public class Game{
             sendMessageToAll(ChatColor.GREEN + newProcurador.getName() +  ChatColor.YELLOW + " agora está te procurando!");
         }else
             finishGame(true);
+    }
+    public void finded(Player player){
+        remove(player);
+        addPlayer(player, true);
+        _verifyIfExistAEscondedor();
     }
 
     public void join(Player player){
@@ -205,6 +246,10 @@ public class Game{
         if(procuradores.size() == 0 && gameState == GameState.GAMEPLAY)
             selectNewProcurador();
     }
+    private void _verifyIfExistAEscondedor(){
+        if(escondedores.size() == 0 && gameState == GameState.GAMEPLAY)
+            finishGame(false);
+    }
 
     //items
     private void giveItemsToEveryOne(){
@@ -221,10 +266,16 @@ public class Game{
         }
     }
     private void giveProcuradorsItemsTo(Player p){
-        //todo
+        p.getInventory().clear();
+        p.getInventory().addItem(GameItems.getStickProcurador());
+        p.getInventory().setItem(EquipmentSlot.CHEST, GameItems.getProcuradorRoupa());
+        p.getInventory().addItem(GameItems.getFirework(2));
+        p.getInventory().addItem(GameItems.getSnowball(1));
     }
     private void giveEscondedoresItemsTo(Player p){
-        //todo
+        p.getInventory().clear();
+        p.getInventory().addItem(GameItems.getStickEscondedor());
+        p.getInventory().setItem(EquipmentSlot.CHEST, GameItems.getEscondedorRoupa());
     }
 
     //funcs
@@ -238,7 +289,13 @@ public class Game{
     }
 
     public void sendTitleToAll(String title){
-        //todo
+        PacketPlayOutTitle packet = new PacketPlayOutTitle(PacketPlayOutTitle.EnumTitleAction.TITLE, IChatBaseComponent.ChatSerializer.a("{\"text\":\"" + title + "\"}"));
+        for(Player p : this.escondedores)
+            (((CraftPlayer)p).getHandle()).playerConnection.sendPacket(packet);
+        for(Player p : this.procuradores)
+            (((CraftPlayer)p).getHandle()).playerConnection.sendPacket(packet);
+        for(Player p : this.espectadores)
+            (((CraftPlayer)p).getHandle()).playerConnection.sendPacket(packet);
     }
 
 }
