@@ -3,10 +3,12 @@ package com.luisz.hideandseekpowers.events;
 import com.luisz.hideandseekpowers.Main;
 import com.luisz.hideandseekpowers.building.BuildingMemory;
 import com.luisz.hideandseekpowers.game.Game;
+import com.luisz.hideandseekpowers.game.GameItems;
 import com.luisz.hideandseekpowers.game.sign.SignGame;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -14,10 +16,10 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.inventory.InventoryInteractEvent;
-import org.bukkit.event.player.PlayerArmorStandManipulateEvent;
-import org.bukkit.event.player.PlayerBedEnterEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.*;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 public class Events implements Listener {
 
@@ -102,6 +104,56 @@ public class Events implements Listener {
     public void onArmorManipulate(PlayerArmorStandManipulateEvent e){
         if(Main.gameController.get(e.getPlayer()) != null)
             e.setCancelled(true);
+    }
+
+    @EventHandler
+    public void onEntityInteractAtEntity(PlayerInteractAtEntityEvent e){
+        Game game = Main.gameController.get(e.getPlayer());
+        if(game != null){
+            e.setCancelled(haveUsedPower(game, e.getPlayer()));
+        }
+    }
+    @EventHandler
+    public void onEntityInteract(PlayerInteractEvent e){
+        Game game = Main.gameController.get(e.getPlayer());
+        if(game != null){
+            if(e.getAction() == Action.RIGHT_CLICK_BLOCK || e.getAction() == Action.RIGHT_CLICK_AIR)
+                e.setCancelled(haveUsedPower(game, e.getPlayer()));
+        }
+    }
+    private boolean haveUsedPower(Game game, Player player){
+        boolean setCancelled = true;
+        ItemStack item = player.getInventory().getItemInMainHand();
+        if(Main.powersController.isAPower(item)){
+            if(game.getGamePowerController().usePower(Main.powersController.createPower(Main.powersController.getPowerClass(item), game, player, player.getLocation()))){
+                if(item.getAmount() <= 1)
+                    player.getInventory().setItemInMainHand(null);
+                else{
+                    item.setAmount(item.getAmount() - 1);
+                    player.getInventory().setItemInMainHand(item);
+                }
+            }
+        }else if(GameItems.isAProcuradorPower(item)){
+            if(item.getAmount() <= 1)
+                player.getInventory().setItemInMainHand(null);
+            else{
+                item.setAmount(item.getAmount() - 1);
+                player.getInventory().setItemInMainHand(item);
+            }
+            if(item.getType() == Material.FIREWORK_ROCKET){
+                for(Player p : game.getEscondedores()) {
+                    p.getWorld().spawnEntity(p.getLocation(), EntityType.FIREWORK);
+                    p.getWorld().spawnEntity(p.getLocation(), EntityType.FIREWORK);
+                    p.getWorld().spawnEntity(p.getLocation(), EntityType.FIREWORK);
+                }
+            }else if(item.getType() == Material.SNOWBALL)
+                setCancelled = false;
+            else if(item.getType() == Material.GLOWSTONE_DUST){
+                for(Player p : game.getEscondedores())
+                    p.addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, 8*20, 1));
+            }
+        }
+        return setCancelled;
     }
 
 }

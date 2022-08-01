@@ -1,5 +1,6 @@
 package com.luisz.hideandseekpowers.game;
 
+import com.luisz.hideandseekpowers.game.power.Power;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
@@ -32,6 +33,12 @@ public class GameItems {
     }
     public static ItemStack getGlowstoneDust(int amount){
         return createItem(Material.GLOWSTONE_DUST, amount, ChatColor.GOLD + "Brilhem");
+    }
+
+    public static boolean isAProcuradorPower(ItemStack item) {
+        return getFirework(1).getType() == item.getType()
+                || getSnowball(1).getType() == item.getType()
+                || getGlowstoneDust(1).getType() == item.getType();
     }
 
     private static ItemStack createItem(Material material, int amount, String name){

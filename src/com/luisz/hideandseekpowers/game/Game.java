@@ -121,8 +121,10 @@ public class Game{
                     finishGame(true);
                 else if(time < 10)
                     sendMessageToAll(ChatColor.YELLOW + "O jogo acaba em " + time + " segundo(s)!");
-                else if(time % 60 == 0)
+                else if(time % 60 == 0) {
                     sendMessageToAll(ChatColor.YELLOW + "O jogo acaba em " + (time / 60) + " minuto(s)!");
+                    //todo give some power to procurador
+                }
                 break;
             case STOPING:
                 if(time <= 0)
@@ -273,7 +275,6 @@ public class Game{
         p.getInventory().addItem(GameItems.getStickProcurador());
         p.getInventory().setItem(EquipmentSlot.CHEST, GameItems.getProcuradorRoupa());
         p.getInventory().addItem(GameItems.getFirework(2));
-        p.getInventory().addItem(GameItems.getSnowball(1));
     }
     private void giveEscondedoresItemsTo(Player p){
         p.getInventory().clear();

@@ -10,8 +10,6 @@ import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.player.PlayerInteractAtEntityEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.potion.PotionEffect;
 
 public class GameListener implements Listener {
@@ -87,15 +85,6 @@ public class GameListener implements Listener {
                 }
             }
         }
-    }
-
-    @EventHandler
-    public void onEntityInteractAtEntity(PlayerInteractAtEntityEvent e){
-        //todo: powers & procuradores powers
-    }
-    @EventHandler
-    public void onEntityInteractAtEntity(PlayerInteractEvent e){
-        //todo
     }
 
 }

@@ -42,6 +42,16 @@ public class PowersController extends Controller<Class<? extends Power>>{
         return null;
     }
 
+    public Class<? extends Power> getPowerClass(ItemStack item){
+        for(Class<? extends Power> powerC : _data){
+            ItemStack powerItem = createEmptyPowerThatDoesntWork(powerC).getDefaultItemAndAmount();
+            if(powerItem.getType() == item.getType() &&
+                    powerItem.getItemMeta().getDisplayName().equalsIgnoreCase(item.getItemMeta().getDisplayName()))
+                return powerC;
+        }
+        return null;
+    }
+
     public boolean isAPower(ItemStack item) {
         for(Class<? extends Power> powerC : _data){
             ItemStack powerItem = createEmptyPowerThatDoesntWork(powerC).getDefaultItemAndAmount();
