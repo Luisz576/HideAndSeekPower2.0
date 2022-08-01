@@ -84,6 +84,9 @@ public class Game{
     public boolean isPlayerInsideThisGame(Player player) {
         return this.procuradores.contains(player) || this.escondedores.contains(player) || this.espectadores.contains(player);
     }
+    public boolean isEscondedor(Player player){
+        return this.escondedores.contains(player);
+    }
 
     public Game(Arena arena){
         this.arena = arena;

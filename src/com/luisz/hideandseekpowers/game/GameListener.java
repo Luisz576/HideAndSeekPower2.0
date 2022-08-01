@@ -6,11 +6,13 @@ import com.luisz.hideandseekpowers.game.events.PlayerJoinInGameEvent;
 import com.luisz.hideandseekpowers.game.events.PlayerQuitOfGameEvent;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.potion.PotionEffect;
 
 public class GameListener implements Listener {
 
@@ -44,28 +46,40 @@ public class GameListener implements Listener {
     public void onPlayerIsFindInGame(PlayerFindedEvent e){
         game.addPointTo(e.finder);
         game.finded(e.who);
+        e.who.setHealth(20);
+        e.who.setFoodLevel(20);
+        e.who.setLevel(0);
+        for(PotionEffect pe : e.who.getActivePotionEffects())
+            e.who.removePotionEffect(pe.getType());
         game.sendMessageToAll(ChatColor.GREEN + e.who.getName() + ChatColor.YELLOW + " foi encontrado por " + ChatColor.RED + e.finder.getName() + ChatColor.YELLOW + "!");
     }
 
     //
     @EventHandler
-    public void onEntityDamageByEntity(EntityDamageByEntityEvent e){
-        if(e.getDamager() instanceof Player){
-            Player damager = (Player) e.getDamager();
-            Game gameOfDamager = Main.gameController.get(damager);
-            if(gameOfDamager != null && gameOfDamager.getArenaName().equalsIgnoreCase(game.getArenaName())){
-                e.setCancelled(true);
-                if(e.getEntity() instanceof Player){
-                    Player entity = (Player) e.getEntity();
-                    Game gameOfEntity = Main.gameController.get(entity);
-                    if(gameOfEntity != null && gameOfEntity.getArenaName().equalsIgnoreCase(game.getArenaName())){
-                        if(game.getProcuradores().contains(damager) && game.getEscondedores().contains(entity)) {
-                            if (game.getGameState() == GameState.GAMEPLAY) {
-                                e.setDamage(10.0);
-                                if(entity.getHealth() - 10.0 > 0.0){
-                                    e.setCancelled(false);
-                                }else{
-                                    Main.pm.callEvent(new PlayerFindedEvent(game, entity, damager));
+    public void onEntityDamageByEntity(EntityDamageByEntityEvent e) {
+        if (e.getDamager() instanceof Player || e.getDamager() instanceof Projectile) {
+            Player damager = null;
+            if(e.getDamager() instanceof Player)
+                damager = (Player) e.getDamager();
+            else if(((Projectile)e.getDamager()).getShooter() instanceof Player){
+                damager = (Player) ((Projectile)e.getDamager()).getShooter();
+            }
+            if(damager != null) {
+                Game gameOfDamager = Main.gameController.get(damager);
+                if (gameOfDamager != null && gameOfDamager.getArenaName().equalsIgnoreCase(game.getArenaName())) {
+                    e.setCancelled(true);
+                    if (e.getEntity() instanceof Player) {
+                        Player entity = (Player) e.getEntity();
+                        Game gameOfEntity = Main.gameController.get(entity);
+                        if (gameOfEntity != null && gameOfEntity.getArenaName().equalsIgnoreCase(game.getArenaName())) {
+                            if (game.getProcuradores().contains(damager) && game.getEscondedores().contains(entity)) {
+                                if (game.getGameState() == GameState.GAMEPLAY) {
+                                    e.setDamage(10.0);
+                                    if (entity.getHealth() - 10.0 > 0.0) {
+                                        e.setCancelled(false);
+                                    } else {
+                                        Main.pm.callEvent(new PlayerFindedEvent(game, entity, damager));
+                                    }
                                 }
                             }
                         }

@@ -14,6 +14,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.inventory.InventoryInteractEvent;
+import org.bukkit.event.player.PlayerArmorStandManipulateEvent;
 import org.bukkit.event.player.PlayerBedEnterEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
@@ -95,6 +96,12 @@ public class Events implements Listener {
         if(e.getWhoClicked() instanceof Player)
             if(Main.gameController.get((Player) e.getWhoClicked()) != null)
                 e.setCancelled(true);
+    }
+
+    @EventHandler
+    public void onArmorManipulate(PlayerArmorStandManipulateEvent e){
+        if(Main.gameController.get(e.getPlayer()) != null)
+            e.setCancelled(true);
     }
 
 }
