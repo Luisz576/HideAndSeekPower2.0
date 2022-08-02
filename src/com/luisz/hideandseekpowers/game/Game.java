@@ -9,10 +9,7 @@ import com.luisz.hideandseekpowers.game.power.Power;
 import com.luisz.hideandseekpowers.game.scoreboard.GameScoreboard;
 import net.minecraft.server.v1_16_R3.IChatBaseComponent;
 import net.minecraft.server.v1_16_R3.PacketPlayOutTitle;
-import org.bukkit.ChatColor;
-import org.bukkit.Difficulty;
-import org.bukkit.GameMode;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
@@ -27,7 +24,7 @@ import java.util.Random;
 public class Game{
     public static final int TIME_TO_START = 30,
             TIME_TO_HIDE = 60,
-            TIME_TO_FINISH = 10*60,
+            TIME_TO_FINISH = 15*60,
             TIME_TO_CLOSE = 20;
 
     private final GameScoreboard gameScoreboard;
@@ -35,6 +32,8 @@ public class Game{
     public String getArenaName(){
         return arena.name;
     }
+    public Location getLobby(){ return arena.lobby; }
+    public Location getSpawn(){ return arena.spawn; }
     public World getWorld(){ return arena.getWorld(); }
     private final GamePowerController gamePowerController;
     public GamePowerController getGamePowerController() {
@@ -121,9 +120,13 @@ public class Game{
                     finishGame(true);
                 else if(time < 10)
                     sendMessageToAll(ChatColor.YELLOW + "O jogo acaba em " + time + " segundo(s)!");
-                else if(time % 60 == 0) {
+                else if(time % 60 == 0 && time != TIME_TO_FINISH) {
                     sendMessageToAll(ChatColor.YELLOW + "O jogo acaba em " + (time / 60) + " minuto(s)!");
-                    //todo give some power to procurador
+                    if(time % (60*2) == 0){
+                        procuradores.get(new Random().nextInt(procuradores.size())).getInventory().addItem(GameItems.getSnowball(1));
+                    }else if(time % (60*4) == 0 || time == 60){
+                        procuradores.get(new Random().nextInt(procuradores.size())).getInventory().addItem(GameItems.getGlowstoneDust(1));
+                    }
                 }
                 break;
             case STOPING:

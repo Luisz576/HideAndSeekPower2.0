@@ -4,6 +4,7 @@ import com.luisz.hideandseekpowers.Main;
 import com.luisz.hideandseekpowers.building.BuildingMemory;
 import com.luisz.hideandseekpowers.game.Game;
 import com.luisz.hideandseekpowers.game.GameItems;
+import com.luisz.hideandseekpowers.game.GameState;
 import com.luisz.hideandseekpowers.game.sign.SignGame;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -15,6 +16,8 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.entity.EntityDamageByBlockEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.inventory.InventoryInteractEvent;
 import org.bukkit.event.player.*;
 import org.bukkit.inventory.ItemStack;
@@ -154,6 +157,33 @@ public class Events implements Listener {
             }
         }
         return setCancelled;
+    }
+
+    @EventHandler
+    public void onEntityDamageByBlock(EntityDamageByBlockEvent e){
+        if(e.getEntity() instanceof Player)
+            if(Main.gameController.get((Player) e.getEntity()) != null)
+                e.setCancelled(true);
+    }
+
+
+    @EventHandler
+    public void onEntityDamage(EntityDamageEvent e){
+        if(e.getEntity() instanceof Player)
+            if(Main.gameController.get((Player) e.getEntity()) != null)
+                if(e.getCause() == EntityDamageEvent.DamageCause.FALL ||
+                    e.getCause() == EntityDamageEvent.DamageCause.FIRE ||
+                    e.getCause() == EntityDamageEvent.DamageCause.FIRE_TICK ||
+                    e.getCause() == EntityDamageEvent.DamageCause.LAVA ||
+                    e.getCause() == EntityDamageEvent.DamageCause.SUFFOCATION) {
+                    e.setCancelled(true);
+                }else if(e.getCause() == EntityDamageEvent.DamageCause.VOID){
+                    Game game = Main.gameController.get((Player) e.getEntity());
+                    if(game.getGameState() == GameState.RECRUITING)
+                        ((Player) e.getEntity()).teleport(game.getLobby());
+                    else
+                        ((Player) e.getEntity()).teleport(game.getSpawn());
+                }
     }
 
 }

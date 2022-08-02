@@ -10,4 +10,8 @@ public class LConvert {
         }
     }
 
+    public static int module(int a){
+        return a >= 0 ? a : a*-1;
+    }
+
 }

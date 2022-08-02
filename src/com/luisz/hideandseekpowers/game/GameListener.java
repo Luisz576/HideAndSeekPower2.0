@@ -49,6 +49,7 @@ public class GameListener implements Listener {
         e.who.setLevel(0);
         for(PotionEffect pe : e.who.getActivePotionEffects())
             e.who.removePotionEffect(pe.getType());
+        e.finder.getInventory().addItem(GameItems.getFirework(2));
         game.sendMessageToAll(ChatColor.GREEN + e.who.getName() + ChatColor.YELLOW + " foi encontrado por " + ChatColor.RED + e.finder.getName() + ChatColor.YELLOW + "!");
     }
 
