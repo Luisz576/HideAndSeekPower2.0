@@ -1,6 +1,5 @@
 package com.luisz.hideandseekpowers.game.power.powers;
 
-import com.luisz.hideandseekpowers.Main;
 import com.luisz.hideandseekpowers.game.Game;
 import com.luisz.hideandseekpowers.game.power.Power;
 import org.bukkit.ChatColor;
@@ -10,18 +9,21 @@ import org.bukkit.entity.Player;
 
 import java.util.Random;
 
-public class Gift extends Power {
+public class SecondChance extends Power {
 
-    public Gift(Game game, Player who, Location whereUse){
+    public SecondChance(Game game, Player who, Location whereUse){
         super(game, who, whereUse);
     }
 
     @Override
     public boolean onOnlyUse() {
-        Random r = new Random();
-        Player pr = game.getEscondedores().get(r.nextInt(game.getEscondedores().size()));
-        pr.getInventory().addItem(Main.powersController.getRandomPower(true).getDefaultItemAndAmount());
-        return true;
+        if(game.getProcuradores().size() > 1){
+            Player p = game.getProcuradores().get(new Random().nextInt(game.getProcuradores().size()));
+            game._addEscondedorForced(p);
+            game.sendMessageToAll(ChatColor.GREEN + p.getName() + ChatColor.YELLOW + " recebeu uma segunda chance de " + ChatColor.RED + who.getName() + ChatColor.YELLOW + "!");
+        }else
+            who.sendMessage(ChatColor.RED + "Só há uma fera!");
+        return false;
     }
 
     @Override
@@ -34,7 +36,7 @@ public class Gift extends Power {
     }
     @Override
     public Material getIcon() {
-        return Material.DRIED_KELP_BLOCK;
+        return Material.ROSE_BUSH;
     }
     @Override
     public int getDefaultAmount() {
@@ -42,14 +44,14 @@ public class Gift extends Power {
     }
     @Override
     public boolean thisPowerCanGiveAnother() {
-        return true;
+        return false;
     }
     @Override
     public String getName(){
-        return "Gift";
+        return "Second Chance";
     }
     @Override
     public ChatColor getColorName(){
-        return ChatColor.GREEN;
+        return ChatColor.DARK_RED;
     }
 }

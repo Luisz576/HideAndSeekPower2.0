@@ -15,7 +15,7 @@ public class Regive extends Power {
     }
 
     @Override
-    public void onOnlyUse() {
+    public boolean onOnlyUse() {
         for(Player p : game.getEscondedores()){
             for(int i = 0; i < 9; i++){
                 if(Main.powersController.isAPower(p.getInventory().getItem(i))){
@@ -23,6 +23,7 @@ public class Regive extends Power {
                 }
             }
         }
+        return true;
     }
 
     @Override

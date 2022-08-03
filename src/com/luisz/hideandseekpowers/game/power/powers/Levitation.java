@@ -16,8 +16,9 @@ public class Levitation extends Power {
     }
 
     @Override
-    public void onOnlyUse() {
+    public boolean onOnlyUse() {
         this.who.addPotionEffect(new PotionEffect(PotionEffectType.LEVITATION, 6*20, 3));
+        return true;
     }
 
     @Override

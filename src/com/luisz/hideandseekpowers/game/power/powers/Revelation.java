@@ -17,11 +17,12 @@ public class Revelation extends Power {
     }
 
     @Override
-    public void onOnlyUse() {
+    public boolean onOnlyUse() {
         for(Player procurador : game.getProcuradores()) {
             procurador.addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, 6 * 20, 2));
             NMS.sendTitle(ChatColor.RED + "Revelado", procurador);
         }
+        return true;
     }
 
     @Override

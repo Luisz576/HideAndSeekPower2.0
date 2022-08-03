@@ -16,9 +16,10 @@ public class Blindness extends Power {
     }
 
     @Override
-    public void onOnlyUse() {
+    public boolean onOnlyUse() {
         for(Player p : game.getProcuradores())
             p.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 10*20, 3));
+        return true;
     }
 
     @Override

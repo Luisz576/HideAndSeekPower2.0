@@ -21,7 +21,7 @@ public class X9 extends Power {
     }
 
     @Override
-    public void onOnlyUse() {
+    public boolean onOnlyUse() {
         List<Player> players = game.getEscondedores();
         players.remove(who);
         if(players.size() > 0){
@@ -52,7 +52,9 @@ public class X9 extends Power {
             Objects.requireNonNull(nextTo).addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, 6 * 20, 2));
             game.getWorld().spawnEntity(nextTo.getLocation(), EntityType.FIREWORK);
             game.getWorld().spawnEntity(nextTo.getLocation(), EntityType.FIREWORK);
+            return true;
         }
+        return false;
     }
 
     @Override

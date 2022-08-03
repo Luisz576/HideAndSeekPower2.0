@@ -30,8 +30,8 @@ public abstract class Power implements IPower{
     @Override
     public void onStop() {}
     @Override
-    public void onOnlyUse() {
-
+    public boolean onOnlyUse() {
+        return false;
     }
     @Override
     public void run() {}

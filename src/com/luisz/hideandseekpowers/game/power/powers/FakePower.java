@@ -15,7 +15,7 @@ public class FakePower extends Power {
     }
 
     @Override
-    public void onOnlyUse() {
+    public boolean onOnlyUse() {
         int count = 0;
         while(count < Main.powersController.size()){
             Power power = Main.powersController.createPower(Main.powersController.get(count), game, who, whereUse);
@@ -25,6 +25,7 @@ public class FakePower extends Power {
             }
             count++;
         }
+        return true;
     }
 
     @Override

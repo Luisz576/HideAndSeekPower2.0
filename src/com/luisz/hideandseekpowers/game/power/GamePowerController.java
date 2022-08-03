@@ -60,7 +60,7 @@ public class GamePowerController {
             this.powersRunning.put(power, power.getTimeRun());
             power.onStart();
         }else
-            power.onOnlyUse();
+            return power.onOnlyUse();
         return true;
     }
 

@@ -200,14 +200,20 @@ public class Game{
         player.setExp(0);
         return wasPlayer;
     }
+    public void _addEscondedorForced(Player player){
+        addPlayer(player, false);
+    }
     private void addPlayer(Player player, boolean procurador){
         remove(player);
         player.setGameMode(GameMode.ADVENTURE);
         if(procurador) {
             procuradores.add(player);
             giveProcuradorsItemsTo(player);
-        }else
+        }else {
             escondedores.add(player);
+            if(gameState != GameState.RECRUITING)
+                giveEscondedoresItemsTo(player);
+        }
     }
     private void addEspectador(Player player){
         remove(player);

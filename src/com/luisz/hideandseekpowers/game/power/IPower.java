@@ -5,7 +5,7 @@ import org.bukkit.entity.Player;
 public interface IPower {
     void onStart();
     void onStop();
-    void onOnlyUse();
+    boolean onOnlyUse();
     boolean thisPowerCanGiveAnother();
     void onNeedWaitDelay(int delay);
     Player getWhoUse();

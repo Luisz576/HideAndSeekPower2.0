@@ -17,7 +17,7 @@ public class SoulExchange extends Power {
     }
 
     @Override
-    public void onOnlyUse() {
+    public boolean onOnlyUse() {
         Random r = new Random();
         List<Player> players = game.getEscondedores();
         players.remove(who);
@@ -27,6 +27,7 @@ public class SoulExchange extends Power {
         pt.sendMessage(ChatColor.YELLOW + who.getName() + " trocou com você!");
         who.teleport(target);
         who.sendMessage("Você trocou com " + ChatColor.YELLOW + pt.getName() + "!");
+        return true;
     }
 
     @Override

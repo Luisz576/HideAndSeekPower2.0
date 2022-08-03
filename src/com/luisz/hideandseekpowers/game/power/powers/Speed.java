@@ -16,8 +16,9 @@ public class Speed extends Power {
     }
 
     @Override
-    public void onOnlyUse() {
+    public boolean onOnlyUse() {
         this.who.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 8*20, 2));
+        return true;
     }
 
     @Override
