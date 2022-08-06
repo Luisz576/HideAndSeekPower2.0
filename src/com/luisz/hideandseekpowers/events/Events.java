@@ -121,7 +121,7 @@ public class Events implements Listener {
         Game game = Main.gameController.get(e.getPlayer());
         if(game != null){
             if(e.getAction() == Action.RIGHT_CLICK_BLOCK || e.getAction() == Action.RIGHT_CLICK_AIR)
-                e.setCancelled(haveUsedPower(game, e.getPlayer()));
+                haveUsedPower(game, e.getPlayer());
         }
     }
     private boolean haveUsedPower(Game game, Player player){
@@ -130,7 +130,7 @@ public class Events implements Listener {
         if(Main.powersController.isAPower(item)){
             if(game.getGamePowerController().usePower(Main.powersController.createPower(Main.powersController.getPowerClass(item), game, player, player.getLocation()))){
                 if(item.getAmount() <= 1)
-                    player.getInventory().setItemInMainHand(null);
+                    player.getInventory().setItemInMainHand(new ItemStack(Material.AIR));
                 else{
                     item.setAmount(item.getAmount() - 1);
                     player.getInventory().setItemInMainHand(item);
@@ -138,7 +138,7 @@ public class Events implements Listener {
             }
         }else if(GameItems.isAProcuradorPower(item)){
             if(item.getAmount() <= 1)
-                player.getInventory().setItemInMainHand(null);
+                player.getInventory().setItemInMainHand(new ItemStack(Material.AIR));
             else{
                 item.setAmount(item.getAmount() - 1);
                 player.getInventory().setItemInMainHand(item);
@@ -184,6 +184,12 @@ public class Events implements Listener {
                     else
                         ((Player) e.getEntity()).teleport(game.getSpawn());
                 }
+    }
+
+    @EventHandler
+    public void onDropItem(PlayerDropItemEvent e){
+        if(Main.gameController.get(e.getPlayer()) != null)
+            e.setCancelled(true);
     }
 
 }

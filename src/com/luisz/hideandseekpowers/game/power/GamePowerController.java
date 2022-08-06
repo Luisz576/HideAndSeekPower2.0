@@ -16,6 +16,10 @@ public class GamePowerController {
             this.runId = Main.sc.scheduleSyncRepeatingTask(Main.instance, this::run, 0, 1L);
     }
 
+    public void _resetAllDelays(){
+        powersDelay.clear();
+    }
+
     private void run(){ //every tick
         for(Player pDelay : this.powersDelay.keySet()){
             for(Class<? extends IPower> cDelay : this.powersDelay.get(pDelay).keySet()){

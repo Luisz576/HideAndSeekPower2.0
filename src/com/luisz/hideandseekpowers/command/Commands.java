@@ -27,6 +27,22 @@ public class Commands implements CommandExecutor {
         if(cmd.getName().equalsIgnoreCase("hasp")){
             if(args.length > 0){
                 switch(args[0].toLowerCase()){
+                    case "forcetime":
+                        if(args.length > 2){
+                            String arena = args[1].toLowerCase();
+                            int time = LConvert.convertToInteger(args[2]);
+                            Game game = Main.gameController.getByArena(arena);
+                            if(game != null){
+                                if(time >= 0){
+                                    game._forceTime(time);
+                                    p.sendMessage(ChatColor.YELLOW + "Time atualizado para: " + time);
+                                }else
+                                    p.sendMessage(ChatColor.RED + "Informe um número válido!");
+                            }else
+                                p.sendMessage(ChatColor.RED + "A arena está fechada ou não existe!");
+                        }else
+                            p.sendMessage(ChatColor.RED + "Use: /hasp forcetime <arena> <time>");
+                        break;
                     case "getpower":
                         if(args.length > 1){
                             int pId = LConvert.convertToInteger(args[1]);

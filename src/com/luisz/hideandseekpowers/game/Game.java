@@ -6,6 +6,7 @@ import com.luisz.hideandseekpowers.game.events.PlayerJoinInGameEvent;
 import com.luisz.hideandseekpowers.game.events.PlayerQuitOfGameEvent;
 import com.luisz.hideandseekpowers.game.power.GamePowerController;
 import com.luisz.hideandseekpowers.game.power.Power;
+import com.luisz.hideandseekpowers.game.power.powers.Invisibility;
 import com.luisz.hideandseekpowers.game.scoreboard.GameScoreboard;
 import net.minecraft.server.v1_16_R3.IChatBaseComponent;
 import net.minecraft.server.v1_16_R3.PacketPlayOutTitle;
@@ -16,10 +17,7 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.potion.PotionEffect;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 public class Game{
     public static final int TIME_TO_START = 30,
@@ -143,8 +141,10 @@ public class Game{
     private void startHiding(){
         this.gameState = GameState.HIDING;
         this.time = TIME_TO_HIDE;
-        for(Player p : escondedores)
+        for(Player p : escondedores) {
             p.teleport(arena.spawn);
+            gamePowerController.usePower(new Invisibility(this, p, p.getLocation()));
+        }
         for(Player p : espectadores)
             p.teleport(arena.spawn);
         // if something just happens
@@ -154,6 +154,7 @@ public class Game{
     private void startGame(){
         this.gameState = GameState.GAMEPLAY;
         this.time = TIME_TO_FINISH;
+        gamePowerController._resetAllDelays();
         sendMessageToAll(ChatColor.YELLOW + "A fera saiu!");
         sendTitleToAll(ChatColor.YELLOW + "A fera saiu");
         selectNewProcurador();
@@ -175,13 +176,24 @@ public class Game{
         Main.sc.cancelTask(runEachSecondId);
         HandlerList.unregisterAll(this.gameListener);
         Main.gameController.remove(this);
-        // ESPECIFICO PARA O TESTE, AQUI TROCA PARA SEU LOBBY
-        for(Player p : procuradores)
+        for(Player p : procuradores) {
+            p.getInventory().clear();
+            p.setScoreboard(Objects.requireNonNull(Bukkit.getScoreboardManager()).getNewScoreboard());
+            // ESPECIFICO PARA O TESTE, AQUI TROCA PARA SEU LOBBY
             p.teleport(arena.lobby);
-        for(Player p : espectadores)
+        }
+        for(Player p : espectadores){
+            p.getInventory().clear();
+            p.setScoreboard(Objects.requireNonNull(Bukkit.getScoreboardManager()).getNewScoreboard());
+            // ESPECIFICO PARA O TESTE, AQUI TROCA PARA SEU LOBBY
             p.teleport(arena.lobby);
-        for(Player p : escondedores)
+        }
+        for(Player p : escondedores){
+            p.getInventory().clear();
+            p.setScoreboard(Objects.requireNonNull(Bukkit.getScoreboardManager()).getNewScoreboard());
+            // ESPECIFICO PARA O TESTE, AQUI TROCA PARA SEU LOBBY
             p.teleport(arena.lobby);
+        }
     }
 
     //player
@@ -252,6 +264,8 @@ public class Game{
 
     public void quit(Player player){
         boolean wasPlayer = remove(player);
+        player.getInventory().clear();
+        player.setScoreboard(Objects.requireNonNull(Bukkit.getScoreboardManager()).getNewScoreboard());
         Main.pm.callEvent(new PlayerQuitOfGameEvent(this, player, wasPlayer));
         _verifyIfExistAProcurador();
     }
@@ -289,6 +303,10 @@ public class Game{
         p.getInventory().clear();
         p.getInventory().addItem(GameItems.getStickEscondedor());
         p.getInventory().setItem(EquipmentSlot.CHEST, GameItems.getEscondedorRoupa());
+    }
+
+    public void _forceTime(int time){
+        this.time = time;
     }
 
     //funcs
