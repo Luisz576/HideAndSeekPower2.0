@@ -13,7 +13,6 @@ import net.minecraft.server.v1_16_R3.PacketPlayOutTitle;
 import org.bukkit.*;
 import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
-import org.bukkit.event.HandlerList;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.potion.PotionEffect;
 
@@ -27,6 +26,9 @@ public class Game{
 
     private final GameScoreboard gameScoreboard;
     private final Arena arena;
+
+    public final List<Player> playersThatCantKill = new ArrayList<>();
+
     public String getArenaName(){
         return arena.name;
     }
@@ -42,17 +44,19 @@ public class Game{
         return this.gameState;
     }
 
-    private final GameListener gameListener;
-
     //placar
     private final HashMap<Player, Integer> placar = new HashMap<>();
     public void addPointTo(Player player){
-        placar.put(player, placar.get(player) + 1);
+        if(placar.containsKey(player))
+            placar.put(player, placar.get(player) + 1);
+        else
+            placar.put(player, 1);
     }
 
     private final List<Player> procuradores = new ArrayList<>(),
             escondedores = new ArrayList<>(),
             espectadores = new ArrayList<>();
+    private final List<HeartProcurador> hearts = new ArrayList<>();
 
     public List<Player> getProcuradores(){
         return new ArrayList<>(procuradores);
@@ -72,7 +76,7 @@ public class Game{
         return arena.maxPlayers;
     }
 
-    private final int runEachSecondId;
+    private final int runEachSecondId, runHeartId;
     private int time;
     public int getCurrentTime(){
         return time;
@@ -92,20 +96,26 @@ public class Game{
         this.gamePowerController = new GamePowerController();
         this.gameScoreboard = new GameScoreboard(this);
         this.runEachSecondId = Main.sc.scheduleSyncRepeatingTask(Main.instance, this::runEachSecond, 0, 20L);
+        this.runHeartId = Main.sc.scheduleSyncRepeatingTask(Main.instance, this::runHeart, 0, 4L);
         Main.gameController.add(this);
         this.arena.getWorld().setDifficulty(Difficulty.PEACEFUL);
-        this.gameListener = new GameListener(this);
-        Main.pm.registerEvents(this.gameListener, Main.instance);
     }
 
+    private void runHeart(){
+        for(HeartProcurador h : hearts)
+            h.update();
+    }
     private void runEachSecond(){
         gameScoreboard.updateRender();
+        gamePowerController.startGame();
         switch (this.gameState){
             case RECRUITING:
                 if(time <= 0)
                     startHiding();
                 else if(time < 10)
                     sendMessageToAll(ChatColor.YELLOW + "O jogo começa em " + time + " segundo(s)!");
+                if(escondedores.size() < arena.minPlayers)
+                    time = TIME_TO_START;
                 break;
             case HIDING:
                 if(time <= 0)
@@ -143,7 +153,7 @@ public class Game{
         this.time = TIME_TO_HIDE;
         for(Player p : escondedores) {
             p.teleport(arena.spawn);
-            gamePowerController.usePower(new Invisibility(this, p, p.getLocation()));
+            gamePowerController.usePower(new Invisibility(this, p, p.getLocation(), TIME_TO_HIDE * 20));
         }
         for(Player p : espectadores)
             p.teleport(arena.spawn);
@@ -155,6 +165,12 @@ public class Game{
         this.gameState = GameState.GAMEPLAY;
         this.time = TIME_TO_FINISH;
         gamePowerController._resetAllDelays();
+        for(Player p : escondedores)
+            for(PotionEffect pe : p.getActivePotionEffects())
+                p.removePotionEffect(pe.getType());
+        for(Player p : procuradores)
+            for(PotionEffect pe : p.getActivePotionEffects())
+                p.removePotionEffect(pe.getType());
         sendMessageToAll(ChatColor.YELLOW + "A fera saiu!");
         sendTitleToAll(ChatColor.YELLOW + "A fera saiu");
         selectNewProcurador();
@@ -174,7 +190,8 @@ public class Game{
     public void closeGame(){
         this.gameState = GameState.STOPING;
         Main.sc.cancelTask(runEachSecondId);
-        HandlerList.unregisterAll(this.gameListener);
+        Main.sc.cancelTask(runHeartId);
+        gamePowerController.stopGame();
         Main.gameController.remove(this);
         for(Player p : procuradores) {
             p.getInventory().clear();
@@ -220,6 +237,7 @@ public class Game{
         player.setGameMode(GameMode.ADVENTURE);
         if(procurador) {
             procuradores.add(player);
+            hearts.add(new HeartProcurador(this, player));
             giveProcuradorsItemsTo(player);
         }else {
             escondedores.add(player);

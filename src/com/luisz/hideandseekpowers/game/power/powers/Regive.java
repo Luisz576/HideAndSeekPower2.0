@@ -8,6 +8,8 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
+import java.util.List;
+
 public class Regive extends Power {
 
     public Regive(Game game, Player who, Location whereUse){
@@ -16,8 +18,10 @@ public class Regive extends Power {
 
     @Override
     public boolean onOnlyUse() {
-        for(Player p : game.getEscondedores()){
-            for(int i = 0; i < 9; i++){
+        List<Player> escondedores = game.getEscondedores();
+        escondedores.remove(who);
+        for(Player p : escondedores){
+            for(int i = 0; i < 36; i++){
                 if(Main.powersController.isAPower(p.getInventory().getItem(i))){
                     p.getInventory().setItem(i, Main.powersController.getRandomPower(false).getDefaultItemAndAmount());
                 }

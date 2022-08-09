@@ -18,16 +18,20 @@ public class SoulExchange extends Power {
 
     @Override
     public boolean onOnlyUse() {
-        Random r = new Random();
         List<Player> players = game.getEscondedores();
-        players.remove(who);
-        Player pt = players.get(r.nextInt(players.size()));
-        Location target = pt.getLocation();
-        pt.teleport(who.getLocation());
-        pt.sendMessage(ChatColor.YELLOW + who.getName() + " trocou com você!");
-        who.teleport(target);
-        who.sendMessage("Você trocou com " + ChatColor.YELLOW + pt.getName() + "!");
-        return true;
+        if(players.size() > 1){
+            Random r = new Random();
+            players.remove(who);
+            Player pt = players.get(r.nextInt(players.size()));
+            Location target = pt.getLocation();
+            pt.teleport(who.getLocation());
+            pt.sendMessage(ChatColor.YELLOW + who.getName() + " trocou com você!");
+            who.teleport(target);
+            who.sendMessage("Você trocou com " + ChatColor.YELLOW + pt.getName() + "!");
+            return true;
+        }else
+            who.sendMessage(ChatColor.RED + "Você é o único escondedor!");
+        return false;
     }
 
     @Override

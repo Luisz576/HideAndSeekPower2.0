@@ -14,8 +14,18 @@ public class Invencible extends Power {
     }
 
     @Override
+    public void onStart() {
+        game.playersThatCantKill.add(who);
+    }
+
+    @Override
     public void run() {
         this.who.setHealth(20);
+    }
+
+    @Override
+    public void onStop() {
+        game.playersThatCantKill.remove(who);
     }
 
     @Override

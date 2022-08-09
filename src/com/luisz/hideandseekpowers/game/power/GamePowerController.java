@@ -18,6 +18,7 @@ public class GamePowerController {
 
     public void _resetAllDelays(){
         powersDelay.clear();
+        powersRunning.clear();
     }
 
     private void run(){ //every tick
@@ -31,11 +32,11 @@ public class GamePowerController {
         }
         for(IPower power : this.powersRunning.keySet()) {
             power.run();
-            if(this.powersRunning.get(power) <= 1)
+            if(this.powersRunning.get(power) > 1)
                 this.powersRunning.put(power, this.powersRunning.get(power) - 1);
             else {
-                this.powersRunning.remove(power);
                 power.onStop();
+                this.powersRunning.remove(power);
             }
         }
     }

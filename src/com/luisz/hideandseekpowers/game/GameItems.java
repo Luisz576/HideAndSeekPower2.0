@@ -1,6 +1,5 @@
 package com.luisz.hideandseekpowers.game;
 
-import com.luisz.hideandseekpowers.game.power.Power;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
@@ -20,7 +19,7 @@ public class GameItems {
         return createItem(Material.LEATHER_CHESTPLATE, 1, ChatColor.DARK_PURPLE + "Camuflagem");
     }
     public static ItemStack getStickProcurador(){
-        return createItem(Material.BLAZE_POWDER, 1, ChatColor.RED + "C é besta");
+        return createItem(Material.BLAZE_ROD, 1, ChatColor.RED + "C é besta");
     }
     public static ItemStack getProcuradorRoupa(){
         return createItem(Material.IRON_CHESTPLATE, 1, ChatColor.DARK_PURPLE + "Fera");

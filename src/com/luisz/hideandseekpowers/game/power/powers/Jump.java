@@ -16,7 +16,7 @@ public class Jump extends Power {
 
     @Override
     public boolean onOnlyUse() {
-        this.who.setVelocity(new Vector(0, 10, 0));
+        this.who.setVelocity(new Vector(0, 2, 0));
         return true;
     }
 

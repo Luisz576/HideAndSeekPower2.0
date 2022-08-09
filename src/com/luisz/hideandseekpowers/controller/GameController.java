@@ -57,4 +57,13 @@ public class GameController extends Controller<Game>{
                 return g;
         return null;
     }
+
+    public boolean isInSame(Player p1, Player p2) {
+        Game a = get(p1);
+        Game b = get(p2);
+        if(a != null & b != null)
+            return a.getArenaName().equalsIgnoreCase(b.getArenaName());
+        return false;
+    }
+
 }

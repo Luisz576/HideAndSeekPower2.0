@@ -13,10 +13,15 @@ import org.bukkit.potion.PotionEffectType;
 
 public class Invisibility extends Power {
 
-    private final int DURATION = 8*20;
+    private final int DURATION;
 
     public Invisibility(Game game, Player who, Location whereUse){
         super(game, who, whereUse);
+        this.DURATION = 8*20;
+    }
+    public Invisibility(Game game, Player who, Location whereUse, int forcedTime){
+        super(game, who, whereUse);
+        this.DURATION = forcedTime;
     }
 
     @Override

@@ -22,12 +22,16 @@ public class Mount extends Power {
     public void onStart() {
         horse = (Horse) game.getWorld().spawnEntity(whereUse, EntityType.HORSE);
         horse.getInventory().setSaddle(new ItemStack(Material.SADDLE));
+        horse.setDomestication(horse.getMaxDomestication());
+        horse.setOwner(who);
         horse.addPassenger(who);
     }
 
     @Override
     public void onStop() {
         horse.removePassenger(who);
+        horse.getInventory().clear();
+        horse.setHealth(0);
         horse.remove();
     }
 

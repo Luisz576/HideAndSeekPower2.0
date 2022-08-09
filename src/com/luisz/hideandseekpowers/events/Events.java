@@ -5,6 +5,9 @@ import com.luisz.hideandseekpowers.building.BuildingMemory;
 import com.luisz.hideandseekpowers.game.Game;
 import com.luisz.hideandseekpowers.game.GameItems;
 import com.luisz.hideandseekpowers.game.GameState;
+import com.luisz.hideandseekpowers.game.events.PlayerFindedEvent;
+import com.luisz.hideandseekpowers.game.events.PlayerJoinInGameEvent;
+import com.luisz.hideandseekpowers.game.events.PlayerQuitOfGameEvent;
 import com.luisz.hideandseekpowers.game.sign.SignGame;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -17,8 +20,11 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageByBlockEvent;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.inventory.InventoryInteractEvent;
+import org.bukkit.event.entity.ProjectileHitEvent;
+import org.bukkit.event.hanging.HangingBreakEvent;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.*;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
@@ -33,7 +39,7 @@ public class Events implements Listener {
         else if(SignGame.isSign(e.getBlock().getType())) {
             if(Main.signController.get(e.getBlock().getLocation()) == null) {
                 if (Main.gameController.get(e.getPlayer()) == null) {
-                    if (e.getPlayer().getInventory().getItemInMainHand().getType() == Material.WOODEN_PICKAXE) {
+                    if (e.getPlayer().getInventory().getItemInMainHand().getType().equals(Material.WOODEN_PICKAXE)) {
                         BuildingMemory.buildingSign.put(e.getPlayer(), e.getBlock().getLocation());
                         e.getPlayer().sendMessage(ChatColor.YELLOW + "Editando essa Sign");
                         e.setCancelled(true);
@@ -97,10 +103,26 @@ public class Events implements Listener {
     }
 
     @EventHandler
-    public void onInventoryInteract(InventoryInteractEvent e){
-        if(e.getWhoClicked() instanceof Player)
-            if(Main.gameController.get((Player) e.getWhoClicked()) != null)
+    public void onBreakBlocohanging(HangingBreakEvent e) {
+        for(int i = 0; i < Main.gameController.size(); i++)
+            if(e.getEntity().getWorld().getName().equalsIgnoreCase(Main.gameController.get(i).getWorld().getName())) {
                 e.setCancelled(true);
+                return;
+            }
+    }
+
+    @EventHandler
+    public void onPlayerSwapHandItems(PlayerSwapHandItemsEvent e) {
+        if (Main.gameController.get(e.getPlayer()) != null)
+            e.setCancelled(true);
+    }
+
+    @EventHandler
+    public void onInventoryClick(InventoryClickEvent e){
+        if(e.getWhoClicked() instanceof Player) {
+            if (Main.gameController.get((Player) e.getWhoClicked()) != null)
+                e.setCancelled(true);
+        }
     }
 
     @EventHandler
@@ -113,7 +135,7 @@ public class Events implements Listener {
     public void onEntityInteractAtEntity(PlayerInteractAtEntityEvent e){
         Game game = Main.gameController.get(e.getPlayer());
         if(game != null){
-            e.setCancelled(haveUsedPower(game, e.getPlayer()));
+            haveUsedPower(game, e.getPlayer());
         }
     }
     @EventHandler
@@ -124,39 +146,24 @@ public class Events implements Listener {
                 haveUsedPower(game, e.getPlayer());
         }
     }
-    private boolean haveUsedPower(Game game, Player player){
-        boolean setCancelled = true;
+    private void haveUsedPower(Game game, Player player){
         ItemStack item = player.getInventory().getItemInMainHand();
         if(Main.powersController.isAPower(item)){
             if(game.getGamePowerController().usePower(Main.powersController.createPower(Main.powersController.getPowerClass(item), game, player, player.getLocation()))){
-                if(item.getAmount() <= 1)
-                    player.getInventory().setItemInMainHand(new ItemStack(Material.AIR));
-                else{
-                    item.setAmount(item.getAmount() - 1);
-                    player.getInventory().setItemInMainHand(item);
-                }
+                //todo
             }
         }else if(GameItems.isAProcuradorPower(item)){
-            if(item.getAmount() <= 1)
-                player.getInventory().setItemInMainHand(new ItemStack(Material.AIR));
-            else{
-                item.setAmount(item.getAmount() - 1);
-                player.getInventory().setItemInMainHand(item);
-            }
-            if(item.getType() == Material.FIREWORK_ROCKET){
+            if(item.getType().equals(Material.FIREWORK_ROCKET)){
                 for(Player p : game.getEscondedores()) {
                     p.getWorld().spawnEntity(p.getLocation(), EntityType.FIREWORK);
                     p.getWorld().spawnEntity(p.getLocation(), EntityType.FIREWORK);
                     p.getWorld().spawnEntity(p.getLocation(), EntityType.FIREWORK);
                 }
-            }else if(item.getType() == Material.SNOWBALL)
-                setCancelled = false;
-            else if(item.getType() == Material.GLOWSTONE_DUST){
+            }else if(item.getType().equals(Material.GLOWSTONE_DUST)){
                 for(Player p : game.getEscondedores())
                     p.addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, 8*20, 1));
             }
         }
-        return setCancelled;
     }
 
     @EventHandler
@@ -165,7 +172,6 @@ public class Events implements Listener {
             if(Main.gameController.get((Player) e.getEntity()) != null)
                 e.setCancelled(true);
     }
-
 
     @EventHandler
     public void onEntityDamage(EntityDamageEvent e){
@@ -190,6 +196,88 @@ public class Events implements Listener {
     public void onDropItem(PlayerDropItemEvent e){
         if(Main.gameController.get(e.getPlayer()) != null)
             e.setCancelled(true);
+    }
+
+    @EventHandler
+    public void onPickupArrow(PlayerPickupItemEvent e){
+        if(Main.gameController.get(e.getPlayer()) != null)
+            e.setCancelled(true);
+    }
+
+    @EventHandler
+    public void onSnowBallDamage(ProjectileHitEvent e) {
+        if (e.getEntity() instanceof org.bukkit.entity.Snowball &&
+                e.getHitEntity() instanceof Player) {
+            Player p = (Player)e.getHitEntity();
+            if (e.getEntity().getShooter() instanceof Player) {
+                Player shooter = (Player)e.getEntity().getShooter();
+                if(Main.gameController.isInSame(shooter, p)){
+                    Game game = Main.gameController.get(p);
+                    if(game.getEscondedores().contains(p)
+                        && !game.playersThatCantKill.contains(p)){
+                        Main.pm.callEvent(new PlayerFindedEvent(game, p, shooter));
+                    }
+                }
+            }
+        }
+    }
+
+    //
+
+    @EventHandler
+    public void onPlayerJoinInGame(PlayerJoinInGameEvent e){
+        if(e.likePlayer)
+            e.game.sendMessageToAll(ChatColor.GREEN + e.player.getName() + " entrou! " + ChatColor.YELLOW + "[" + e.game.getAmountOfPlayers() + "/" + e.game.getMaxPlayers() + "]");
+        else
+            e.game.sendMessageToAll(ChatColor.GRAY + e.player.getName() + " está espectando!");
+    }
+
+    @EventHandler
+    public void onPlayerQuitOfGame(PlayerQuitOfGameEvent e){
+        if(e.wasPlayer)
+            e.game.sendMessageToAll(ChatColor.RED + e.who.getName() + " saiu!");
+        else
+            e.game.sendMessageToAll(ChatColor.GRAY + e.who.getName() + " não está mais espectando!");
+    }
+
+    @EventHandler
+    public void onPlayerIsFindInGame(PlayerFindedEvent e){
+        e.game.addPointTo(e.finder);
+        e.game.finded(e.who);
+        e.who.setHealth(20);
+        e.who.setFoodLevel(20);
+        e.who.setLevel(0);
+        for(PotionEffect pe : e.who.getActivePotionEffects())
+            e.who.removePotionEffect(pe.getType());
+        e.finder.getInventory().addItem(GameItems.getFirework(2));
+        e.game.sendMessageToAll(ChatColor.GREEN + e.who.getName() + ChatColor.YELLOW + " foi encontrado por " + ChatColor.RED + e.finder.getName() + ChatColor.YELLOW + "!");
+    }
+
+    @EventHandler
+    public void onEntityDamageByEntity(EntityDamageByEntityEvent e) {
+        if (e.getDamager() instanceof Player) {
+            Player damager = (Player) e.getDamager();
+            Game gameOfDamager = Main.gameController.get(damager);
+            if (gameOfDamager != null) {
+                e.setCancelled(true);
+                if (e.getEntity() instanceof Player) {
+                    Player entity = (Player) e.getEntity();
+                    Game gameOfEntity = Main.gameController.get(entity);
+                    if (gameOfEntity != null && gameOfEntity.getArenaName().equalsIgnoreCase(gameOfDamager.getArenaName())) {
+                        if (gameOfEntity.getProcuradores().contains(damager) && gameOfEntity.getEscondedores().contains(entity)) {
+                            if (gameOfEntity.getGameState() == GameState.GAMEPLAY) {
+                                e.setDamage(10.0);
+                                if (entity.getHealth() - 10.0 > 0.0) {
+                                    e.setCancelled(false);
+                                } else {
+                                    Main.pm.callEvent(new PlayerFindedEvent(gameOfEntity, entity, damager));
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 
 }
